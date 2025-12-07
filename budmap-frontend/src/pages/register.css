@@ -1,0 +1,93 @@
+/* FULL PAGE BACKGROUND */
+.register-wrapper {
+  width: 100%;
+  height: 100vh;
+  background: #3a2b2d; /* dark background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
+
+/* MAIN BOX */
+.register-box {
+  width: 100%;
+  max-width: 900px;
+  background: #d3d3d3;
+  padding: 50px;
+  box-sizing: border-box;
+  margin: 0;
+  border: none;
+}
+
+/* HEADER */
+.register-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 22px;
+  margin-bottom: 40px;
+}
+
+.left-text {
+  font-weight: 500;
+}
+
+.center-text {
+  font-weight: 600;
+}
+
+/* FORM SECTION */
+.form-section h3 {
+  margin-bottom: 25px;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+/* 2 COLUMN LAYOUT */
+.row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.column {
+  width: 48%;
+}
+
+/* LABELS */
+.column label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 16px;
+}
+
+/* INPUTS */
+.column input {
+  width: 100%;
+  height: 30px;
+  background: #efefef;
+  border: none;
+  padding-left: 8px;
+}
+
+/* BUTTON */
+.create-btn {
+  margin-top: 25px;
+  padding: 12px 40px;
+  background: white;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* LINKS */
+.links {
+  margin-top: 25px;
+  font-size: 14px;
+}
+
+.links a {
+  color: black;
+  text-decoration: underline;
+}
