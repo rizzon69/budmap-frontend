@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BudMap FYP Poster – Reazon Koirala</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;0,700;0,800;1,700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'Open Sans', sans-serif;
+    background: #fff;
+    color: #1a1a1a;
+    font-size: 10px;
+    line-height: 1.45;
+  }
+
+  .poster {
+    width: 1189px;
+    min-height: 841px;
+    margin: 0 auto;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    padding: 10px 18px 8px;
+    background: #fff;
+    border-bottom: 4px solid #4a9e3a;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .header-left {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 145px;
+  }
+
+  .univ-partner {
+    font-size: 7px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .wolv-logo {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .wolv-text {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 8px;
+    font-weight: 700;
+    color: #1a237e;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    line-height: 1.3;
+  }
+
+  .header-center {
+    text-align: center;
+    flex: 1;
+  }
+
+  .poster-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    color: #111;
+    letter-spacing: -0.3px;
+    line-height: 1.1;
+  }
+
+  .poster-subtitle {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: #333;
+    margin-top: 3px;
+  }
+
+  .student-info {
+    display: flex;
+    gap: 28px;
+    justify-content: center;
+    margin-top: 5px;
+    font-size: 9.5px;
+    color: #222;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 155px;
+    justify-content: flex-end;
+  }
+
+  /* Herald logo — dark bg, gold H, white text */
+  .herald-box {
+    background: #2b2b2b;
+    border-radius: 3px;
+    padding: 5px 8px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .herald-h {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 19px;
+    font-weight: 900;
+    color: #c8a84b;
+    font-style: italic;
+    line-height: 1;
+  }
+
+  .herald-words {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .herald-word {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 6px;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    line-height: 1.4;
+  }
+
+  /* ing logo — green */
+  .ing-logo {
+    background: #4a9e3a;
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 15px;
+    padding: 5px 9px;
+    border-radius: 3px;
+    letter-spacing: -0.5px;
+  }
+
+  /* ── BODY GRID ── */
+  .body {
+    display: grid;
+    grid-template-columns: 222px 1fr 222px;
+    flex: 1;
+    border-top: 2px solid #4a9e3a;
+  }
+
+  /* ── SECTION ── */
+  .section {
+    border: 1px solid #ccc;
+    padding: 8px 11px;
+  }
+
+  .sec-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12.5px;
+    font-weight: 800;
+    font-style: italic;
+    color: #fff;
+    background: #4a9e3a;
+    padding: 3px 10px;
+    margin: -8px -11px 7px -11px;
+    display: block;
+  }
+
+  .section p { font-size: 9.5px; line-height: 1.5; color: #333; margin-bottom: 3px; }
+  .section ul { padding-left: 13px; }
+  .section li { font-size: 9.5px; line-height: 1.5; color: #333; margin-bottom: 2px; }
+
+  .col-left  { grid-column: 1; grid-row: 1 / 4; display: flex; flex-direction: column; }
+  .col-right { grid-column: 3; grid-row: 1 / 4; display: flex; flex-direction: column; }
+  .col-center { grid-column: 2; display: flex; flex-direction: column; }
+
+  /* Academic question box */
+  .aq-box {
+    font-size: 10px;
+    line-height: 1.55;
+    color: #222;
+    padding: 4px 2px;
+  }
+
+  .obj-head { font-size: 9.5px; font-weight: 700; margin: 5px 0 2px; color: #111; }
+
+  /* Gantt */
+  .gantt-table { width: 100%; border-collapse: collapse; margin-top: 4px; }
+  .gantt-table th { background: #4a9e3a; color: #fff; padding: 2px 3px; text-align: center; font-weight: 700; font-size: 7.5px; }
+  .gantt-table td { border: 1px solid #ddd; padding: 1px 3px; font-size: 7.5px; }
+  .g-filled { background: #4a9e3a; }
+
+  /* FDD */
+  .fdd { display: flex; flex-direction: column; align-items: center; gap: 3px; margin-top: 4px; }
+
+  .fdd-root {
+    background: #4a9e3a;
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 8.5px;
+    padding: 3px 16px;
+    border-radius: 2px;
+  }
+
+  .fdd-row { display: flex; gap: 10px; justify-content: center; width: 100%; }
+
+  .fdd-col { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+
+  .fdd-node {
+    background: #e8f5e1;
+    color: #1b5e1b;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 7.5px;
+    padding: 3px 7px;
+    border-radius: 2px;
+    border: 1px solid #4a9e3a;
+    text-align: center;
+    min-width: 108px;
+  }
+
+  .fdd-leaf {
+    background: #fff;
+    color: #333;
+    font-size: 7.5px;
+    padding: 2px 6px;
+    border-radius: 2px;
+    border: 1px solid #bbb;
+    text-align: center;
+    min-width: 100px;
+  }
+
+  .conn-v { width: 1px; height: 5px; background: #999; }
+
+  /* future plans */
+  .fp-item { margin-bottom: 4px; }
+  .fp-item strong { color: #2e7d1e; font-weight: 700; }
+
+  @media print {
+    @page { size: A3 landscape; margin: 0; }
+    body { margin: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .poster { width: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="poster">
+
+  <!-- ── HEADER ── -->
+  <div class="header">
+    <div class="header-left">
+      <div class="univ-partner">University Partner</div>
+      <div class="wolv-logo">
+        <svg width="30" height="36" viewBox="0 0 40 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 2L4 8v16c0 12 7.5 19.5 16 22 8.5-2.5 16-10 16-22V8L20 2z" fill="#1a237e"/>
+          <text x="50%" y="58%" dominant-baseline="middle" text-anchor="middle" font-size="20" font-weight="900" fill="#fff" font-family="serif">W</text>
+        </svg>
+        <div class="wolv-text">University of<br>Wolverhampton</div>
+      </div>
+    </div>
+
+    <div class="header-center">
+      <div class="poster-title">BudMap – Budget Allocation Application</div>
+      <div class="poster-subtitle">Herald College Kathmandu &nbsp;|&nbsp; BSc. Computer Science</div>
+      <div class="student-info">
+        <span><strong>Student Name :</strong> Reazon Koirala</span>
+        <span><strong>University ID :</strong> 2407085</span>
+        <span><strong>Supervisor :</strong> Mr. Javed Khan</span>
+        <span><strong>Reader :</strong> Mr. Asish Acharya</span>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <div class="herald-box">
+        <div class="herald-h">H</div>
+        <div class="herald-words">
+          <span class="herald-word">Herald</span>
+          <span class="herald-word">College</span>
+          <span class="herald-word">Kathmandu</span>
+        </div>
+      </div>
+      <div class="ing-logo">ing</div>
+    </div>
+  </div>
+
+  <!-- ── BODY ── -->
+  <div class="body">
+
+    <!-- ═══ LEFT COLUMN ═══ -->
+    <div class="col-left">
+
+      <!-- Introduction -->
+      <div class="section" style="flex:1.1">
+        <span class="sec-title">Introduction</span>
+        <p>BudMap is a web-based <strong>budget allocation and management application</strong> designed specifically for <strong>SMEs, NGOs, and educational institutions in Nepal</strong>. Many of these organisations still rely on manual, spreadsheet-based, or outdated budgeting methods that are time-consuming, error-prone, and lack transparency.</p>
+        <p style="margin-top:4px">BudMap provides a <strong>centralised digital platform</strong> for financial management — combining real-time dashboards, multi-level approval workflows, predictive analytics, internal messaging, and automated reporting. Built using <strong>React 18, Node.js, Express, and MongoDB Atlas</strong>, it uses Google Gemini AI for intelligent budget forecasting and Google OAuth for secure authentication.</p>
+        <p style="margin-top:4px">The platform addresses critical challenges: lack of transparency, poor resource allocation, absence of role-based collaboration, and inability to generate timely financial insights — helping organisations make data-driven decisions and achieve long-term financial sustainability.</p>
+      </div>
+
+      <!-- Aims -->
+      <div class="section" style="flex:1.9">
+        <span class="sec-title">Aims</span>
+        <p><strong>Aim:</strong> To design and develop a secure, role-based web application that enables SMEs, NGOs, and educational institutions in Nepal to efficiently manage, track, and analyse budgets through a centralised, data-driven platform with AI-powered forecasting.</p>
+
+        <div class="obj-head">Objectives:</div>
+        <ul>
+          <li><strong>User Registration &amp; Auth:</strong> Implement JWT-based authentication with email verification, Google OAuth, and role-based access control for Admin, Finance Officer, Department Head, and Viewer roles.</li>
+          <li><strong>Budget Management:</strong> Enable creation, allocation, and tracking of budgets by fiscal year and department with multi-level approval workflows.</li>
+          <li><strong>Transaction Tracking:</strong> Build income and expense management with a multi-level approval system that auto-updates budget utilization on approval.</li>
+          <li><strong>Analytics &amp; AI Forecasting:</strong> Develop real-time dashboards and deterministic linear regression forecasting, integrated with Google Gemini AI for intelligent budget insights.</li>
+          <li><strong>Internal Messaging:</strong> Implement direct messaging with file attachments (images, PDF, Word, MP4), read receipts, and conversation threads.</li>
+          <li><strong>Reporting:</strong> Generate financial, department-wise, budget performance, and expense trend reports with PDF export functionality.</li>
+          <li><strong>Security &amp; Professionalism:</strong> Apply ethical, legal, and social considerations — including RBAC, data encryption, audit trails, and secure password management throughout development.</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- ═══ CENTER COLUMN ═══ -->
+    <div class="col-center">
+
+      <!-- Academic Question -->
+      <div class="section">
+        <span class="sec-title">Academic Questions</span>
+        <div class="aq-box">
+          How can the integration of role-based access control, AI-powered budget forecasting, and real-time analytics enhance the performance, transparency, and usability of a web-based budget management system for SMEs, NGOs, and educational institutions in Nepal — while addressing ethical, legal, and social responsibilities in its development?
+        </div>
+      </div>
+
+      <!-- Lit Review + Artefact Designs side by side -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;flex:1">
+
+        <!-- Literature Review -->
+        <div class="section">
+          <span class="sec-title">Literature review</span>
+          <ul>
+            <li>Elliyana et al. (2025) — Systematic review on personal financial management: budgeting, investment, debt, and saving practices</li>
+            <li>French, McKillop &amp; Stewart (2020) — Effectiveness of smartphone apps in improving financial capability</li>
+            <li>Bitrián, Buil &amp; Catalán (2021) — Gamification of personal financial management apps for engagement</li>
+            <li>Salahudin et al. (2024) — Digital budgeting transformation and future challenges: bibliometric analysis</li>
+            <li>Bastola (2024) — Financial sustainability of NGOs in Nepal: a qualitative study</li>
+            <li>Shakya et al. (2024) — Determinants affecting small business finance in Nepal</li>
+            <li>Sutherland &amp; Schwaber (2021) — The Scrum Guide: Agile development methodology</li>
+          </ul>
+        </div>
+
+        <!-- Artefact Designs / Gantt -->
+        <div class="section">
+          <span class="sec-title">Artefact Designs</span>
+          <div style="font-weight:700;font-size:9px;margin-bottom:3px;font-style:italic;color:#111">Gantt Chart</div>
+          <table class="gantt-table">
+            <tr>
+              <th style="text-align:left;width:50%">Task / Sprint</th>
+              <th>M1</th><th>M2</th><th>M3</th><th>M4</th><th>M5</th><th>M6</th>
+            </tr>
+            <tr><td>Planning &amp; Research</td><td class="g-filled"></td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>Sprint 1: Auth &amp; Setup</td><td class="g-filled"></td><td class="g-filled"></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>Sprint 2: Core Budgeting</td><td></td><td class="g-filled"></td><td class="g-filled"></td><td></td><td></td><td></td></tr>
+            <tr><td>Sprint 3: Reports &amp; Notif.</td><td></td><td></td><td class="g-filled"></td><td class="g-filled"></td><td></td><td></td></tr>
+            <tr><td>Sprint 4: Analytics &amp; AI</td><td></td><td></td><td></td><td class="g-filled"></td><td class="g-filled"></td><td></td></tr>
+            <tr><td>Sprint 5: Messaging &amp; UI</td><td></td><td></td><td></td><td></td><td class="g-filled"></td><td class="g-filled"></td></tr>
+            <tr><td>Testing &amp; Final Report</td><td></td><td></td><td></td><td></td><td></td><td class="g-filled"></td></tr>
+          </table>
+        </div>
+
+      </div>
+
+      <!-- Functional Decomposition Diagram -->
+      <div class="section" style="flex:1">
+        <span class="sec-title">Functional Decomposition Diagram</span>
+        <div class="fdd">
+          <div class="fdd-root">BudMap – Budget Allocation Application</div>
+          <div class="conn-v" style="height:7px"></div>
+
+          <div class="fdd-row">
+
+            <div class="fdd-col">
+              <div class="fdd-node">User Management</div>
+              <div class="conn-v"></div>
+              <div class="fdd-leaf">Registration &amp; Login</div>
+              <div class="conn-v"></div>
+              <div class="fdd-leaf">JWT / Google OAuth</div>
+              <div class="conn-v"></div>
+              <div class="fdd-leaf">Role-Based Access</div>
+              <div class="conn-v"></div>
+              <div class="fdd-leaf">Profile Management</div>
+            </div>
+
+            <div class="fdd-col">
+              <div class="fdd-node">Budget Management</div>
+              <div class="conn-v"></div>
+              <div class="fdd-leaf">Create Budget</div>
+              <div class="conn-v"></div>
+              <div class="fdd-leaf">Allocation Tracking</div>
+              <div class="conn-v"></div>
+              <div class="fdd-leaf">Approval Workflow</div>
+              <div class="conn-v"></div>
+              <div class="fdd-leaf">Transaction Entry</div>
+            </div>
+
+            <div class="fdd-col">
+              <div class="fdd-node">Analytics &amp; Reports</div>
+              <div class="conn-v"></div>
+              <div class="fdd-leaf">Real-Time Dashboard</div>
+              <div class="conn-v"></div>
+              <div class="fdd-leaf">AI Forecasting</div>
+              <div class="conn-v"></div>
+              <div class="fdd-leaf">Spending Patterns</div>
+              <div class="conn-v"></div>
+              <div class="fdd-leaf">PDF Export Reports</div>
+            </div>
+
+            <div class="fdd-col">
+              <div class="fdd-node">Communication</div>
+              <div class="conn-v"></div>
+              <div class="fdd-leaf">Internal Messaging</div>
+              <div class="conn-v"></div>
+              <div class="fdd-leaf">File Attachments</div>
+              <div class="conn-v"></div>
+              <div class="fdd-leaf">Notifications</div>
+              <div class="conn-v"></div>
+              <div class="fdd-leaf">Email Verification</div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ═══ RIGHT COLUMN ═══ -->
+    <div class="col-right">
+
+      <!-- Evaluation / Reflection -->
+      <div class="section" style="flex:1.25">
+        <span class="sec-title">Evaluation/Reflection</span>
+        <p>BudMap successfully integrates role-based access control, budget tracking, multi-level transaction approval workflows, and AI-powered forecasting through a clean React and Node.js stack. Core features including authentication, dashboards, analytics, and messaging are fully operational.</p>
+        <p style="margin-top:4px">From a professionalism perspective, ethical considerations were central to the design — including data privacy, role-based transparency, and responsible use of AI predictions. Legal compliance was addressed through JWT security, bcrypt password hashing, and audit trail logging. The social impact is significant: BudMap reduces administrative burden for Nepal's SMEs and NGOs while promoting data-driven financial governance.</p>
+        <p style="margin-top:4px">Gaps remain in real SMTP email delivery, file upload UI, and PDF generation — planned for Phase 2. Building BudMap deepened understanding of full-stack development, RESTful API design, MongoDB, and Google Gemini AI integration. Overcoming challenges with JWT security and linear regression forecasting provided valuable real-world engineering experience.</p>
+      </div>
+
+      <!-- Future Plans -->
+      <div class="section" style="flex:1">
+        <span class="sec-title">Future Plans</span>
+        <ul>
+          <li class="fp-item"><strong>Real Email Integration:</strong> Connect Gmail SMTP via Nodemailer for live email verification, password reset, and budget alert notifications.</li>
+          <li class="fp-item"><strong>PDF &amp; Excel Export:</strong> Generate downloadable financial and department-wise reports in PDF and Excel format directly from the dashboard.</li>
+          <li class="fp-item"><strong>Two-Factor Authentication:</strong> Add 2FA support for enhanced account security across all user roles.</li>
+          <li class="fp-item"><strong>Mobile Application:</strong> Develop a React Native mobile app for on-the-go budget monitoring, approvals, and real-time notifications.</li>
+          <li class="fp-item"><strong>WebSocket Notifications:</strong> Implement real-time Socket.io alerts for budget approvals, transaction updates, and budget limit warnings.</li>
+          <li class="fp-item"><strong>Bank API Integration:</strong> Connect with Nepalese banking APIs for automated transaction syncing and real-time financial data import.</li>
+        </ul>
+      </div>
+
+    </div>
+
+  </div><!-- /body -->
+</div><!-- /poster -->
+</body>
+</html>

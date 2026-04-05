@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BudMap – Internal Viva Presentation</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #16a34a;
+    --green-light: #22c55e;
+    --green-dim: #bbf7d0;
+    --dark: #0a0f0d;
+    --dark2: #111815;
+    --dark3: #1a2320;
+    --card: #1e2b27;
+    --border: #2a3d35;
+    --text: #e2f0e8;
+    --muted: #7aaa8f;
+    --white: #ffffff;
+    --code-bg: #0d1f18;
+    --accent: #34d399;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--dark);
+    color: var(--text);
+    height: 100vh;
+    overflow: hidden;
+    user-select: none;
+  }
+
+  /* ── SLIDES ── */
+  .slides { width:100%; height:100vh; position:relative; }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 48px 64px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    transform: translateY(20px);
+    overflow: hidden;
+  }
+
+  .slide.active {
+    opacity: 1;
+    pointer-events: all;
+    transform: translateY(0);
+  }
+
+  /* ── NAV ── */
+  .nav {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--dark2);
+    border: 1px solid var(--border);
+    border-radius: 40px;
+    padding: 10px 20px;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+  }
+
+  .nav button {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+
+  .nav button:hover { background: var(--green); border-color: var(--green); color: #fff; }
+  .nav button:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .nav .slide-count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--muted);
+    min-width: 60px;
+    text-align: center;
+  }
+
+  .dots {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--border);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .dot.active { background: var(--green); width: 20px; border-radius: 3px; }
+
+  /* ── COMMON ── */
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #0d2918;
+    border: 1px solid var(--green);
+    color: var(--green-light);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.5px;
+    margin-bottom: 16px;
+  }
+
+  h1 { font-family: 'Syne', sans-serif; font-weight: 800; }
+  h2 { font-family: 'Syne', sans-serif; font-weight: 700; }
+  h3 { font-family: 'Syne', sans-serif; font-weight: 600; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+  }
+
+  .code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    color: var(--accent);
+    line-height: 1.7;
+    overflow-x: auto;
+  }
+
+  .code .cm { color: var(--muted); }
+  .code .kw { color: #f472b6; }
+  .code .fn { color: #60a5fa; }
+  .code .st { color: #fbbf24; }
+  .code .nu { color: #a78bfa; }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; width: 100%; }
+
+  /* ── SLIDE 1: TITLE ── */
+  #s1 { background: radial-gradient(ellipse 80% 60% at 50% 40%, #0a2918 0%, var(--dark) 70%); }
+
+  #s1 .logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 80px;
+    font-weight: 800;
+    color: var(--white);
+    letter-spacing: -4px;
+    line-height: 1;
+  }
+
+  #s1 .logo span { color: var(--green); }
+
+  #s1 .subtitle {
+    font-size: 18px;
+    color: var(--muted);
+    margin-top: 12px;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+  }
+
+  #s1 .pills {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 32px;
+  }
+
+  #s1 .pill {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  #s1 .pill span { color: var(--green-light); font-weight: 600; }
+
+  #s1 .line {
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--green), transparent);
+    margin: 24px auto;
+  }
+
+  /* ── SLIDE 2: OVERVIEW ── */
+  .overview-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    width: 100%;
+    max-width: 1000px;
+  }
+
+  .ov-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 16px;
+    text-align: center;
+    transition: border-color 0.2s;
+  }
+
+  .ov-card:hover { border-color: var(--green); }
+  .ov-icon { font-size: 28px; margin-bottom: 10px; }
+  .ov-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .ov-val { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; color: var(--white); margin: 4px 0; }
+
+  /* ── SLIDE 3: TECH STACK ── */
+  .stack-row {
+    display: flex;
+    gap: 14px;
+    align-items: stretch;
+    width: 100%;
+    max-width: 960px;
+  }
+
+  .stack-col {
+    flex: 1;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+  }
+
+  .stack-col h3 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--green);
+    margin-bottom: 14px;
+  }
+
+  .stack-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+
+  .stack-item:last-child { border-bottom: none; }
+  .stack-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+  .stack-name { color: var(--white); font-weight: 500; flex: 1; }
+  .stack-role { color: var(--muted); font-size: 11px; }
+
+  /* ── SLIDE 4: AUTH ── */
+  .flow-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 900px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .flow-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--white);
+    text-align: center;
+    min-width: 110px;
+  }
+
+  .flow-box.green { border-color: var(--green); color: var(--green-light); }
+  .flow-box.red   { border-color: #ef4444; color: #fca5a5; }
+
+  .flow-arrow { color: var(--muted); font-size: 18px; }
+
+  /* ── FUNCTION DETAIL SLIDES ── */
+  .fn-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    width: 100%;
+    max-width: 1000px;
+    margin-bottom: 20px;
+  }
+
+  .fn-meta { flex: 1; }
+  .fn-title { font-size: 28px; color: var(--white); margin-bottom: 6px; }
+  .fn-desc  { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+  .fn-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    width: 100%;
+    max-width: 1000px;
+  }
+
+  .fn-panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 20px;
+  }
+
+  .fn-panel h4 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--green);
+    margin-bottom: 12px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .fn-list { list-style: none; }
+  .fn-list li {
+    font-size: 13px;
+    color: var(--text);
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    line-height: 1.5;
+  }
+  .fn-list li:last-child { border-bottom: none; }
+  .fn-list li::before { content: '→'; color: var(--green); flex-shrink: 0; font-weight: 700; }
+
+  .route-pill {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 6px;
+    margin: 3px 3px 3px 0;
+  }
+
+  .get  { background: #0a2918; color: #4ade80; border: 1px solid #166534; }
+  .post { background: #1c1000; color: #fb923c; border: 1px solid #92400e; }
+  .put  { background: #0a1e40; color: #60a5fa; border: 1px solid #1e40af; }
+  .del  { background: #2a0a0a; color: #f87171; border: 1px solid #7f1d1d; }
+
+  .file-ref {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    background: var(--code-bg);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  /* ── SLIDE: ROLES ── */
+  .roles-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    width: 100%;
+    max-width: 1000px;
+  }
+
+  .role-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+  }
+
+  .role-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .role-perm {
+    font-size: 12px;
+    padding: 5px 0;
+    color: var(--text);
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    line-height: 1.4;
+  }
+
+  .role-perm.yes::before { content:'✓'; color: var(--green); font-weight: 700; }
+  .role-perm.no::before  { content:'✗'; color: #ef4444; }
+
+  /* ── BUG FIX SLIDE ── */
+  .bug-list { width: 100%; max-width: 900px; display: flex; flex-direction: column; gap: 12px; }
+
+  .bug-item {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    border-left: 3px solid var(--green);
+  }
+
+  .bug-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    background: var(--green);
+    color: #000;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .bug-title { font-size: 14px; font-weight: 600; color: var(--white); margin-bottom: 4px; }
+  .bug-fix   { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+  /* ── FINAL SLIDE ── */
+  #sfinal { background: radial-gradient(ellipse 70% 50% at 50% 50%, #0a2918 0%, var(--dark) 70%); }
+
+  .done-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    width: 100%;
+    max-width: 760px;
+    margin-top: 24px;
+  }
+
+  .done-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .done-icon { font-size: 20px; }
+
+  /* ── PROGRESS BAR ── */
+  .progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background: var(--green);
+    transition: width 0.4s ease;
+    z-index: 200;
+  }
+
+  /* ── SLIDE COUNTER ── */
+  .slide-num {
+    position: fixed;
+    top: 20px;
+    right: 28px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    z-index: 100;
+  }
+
+  .slide-title-bar {
+    position: fixed;
+    top: 18px;
+    left: 28px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    z-index: 100;
+    letter-spacing: 1px;
+  }
+
+  /* keyboard hint */
+  .hint {
+    position: fixed;
+    bottom: 90px;
+    right: 28px;
+    font-size: 11px;
+    color: var(--border);
+    font-family: 'JetBrains Mono', monospace;
+  }
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+<div class="slide-title-bar" id="slideTitle">BUDMAP</div>
+<div class="slide-num" id="slideNum">01 / 12</div>
+<div class="hint">← → arrow keys</div>
+
+<div class="slides">
+
+  <!-- SLIDE 1: TITLE -->
+  <div class="slide active" id="s1">
+    <div class="tag">🎓 Internal Viva Presentation · 2024–25</div>
+    <div class="logo">Bud<span>Map</span></div>
+    <div class="subtitle">Budget Allocation & Management System for SMEs, NGOs & Educational Institutions in Nepal</div>
+    <div class="line"></div>
+    <div class="pills">
+      <div class="pill">Student: <span>Reazon Koirala</span></div>
+      <div class="pill">ID: <span>2407085</span></div>
+      <div class="pill">Supervisor: <span>Mr. Sangay Lama</span></div>
+      <div class="pill">Reader: <span>Mr. Subash Bista</span></div>
+      <div class="pill">Herald College Kathmandu · <span>BSc CS</span></div>
+    </div>
+  </div>
+
+  <!-- SLIDE 2: PROJECT OVERVIEW -->
+  <div class="slide" id="s2">
+    <div class="tag">📊 Project Overview</div>
+    <h2 style="font-size:32px;color:var(--white);margin-bottom:8px;">What is BudMap?</h2>
+    <p style="color:var(--muted);font-size:15px;margin-bottom:28px;max-width:700px;text-align:center;">A full-stack web application that lets organisations digitally manage budgets, transactions, approvals, messaging, and reporting — all in one place.</p>
+    <div class="overview-grid">
+      <div class="ov-card"><div class="ov-icon">🗄️</div><div class="ov-label">Database</div><div class="ov-val">MongoDB</div><div style="font-size:11px;color:var(--muted)">Atlas Cloud</div></div>
+      <div class="ov-card"><div class="ov-icon">⚙️</div><div class="ov-label">Backend</div><div class="ov-val">Node.js</div><div style="font-size:11px;color:var(--muted)">Express REST API</div></div>
+      <div class="ov-card"><div class="ov-icon">⚛️</div><div class="ov-label">Frontend</div><div class="ov-val">React 18</div><div style="font-size:11px;color:var(--muted)">React Router v6</div></div>
+      <div class="ov-card"><div class="ov-icon">🤖</div><div class="ov-label">AI Engine</div><div class="ov-val">Gemini</div><div style="font-size:11px;color:var(--muted)">Google AI Free</div></div>
+      <div class="ov-card"><div class="ov-icon">🔐</div><div class="ov-label">Auth</div><div class="ov-val">JWT</div><div style="font-size:11px;color:var(--muted)">+ Google OAuth</div></div>
+      <div class="ov-card"><div class="ov-icon">📧</div><div class="ov-label">Email</div><div class="ov-val">Nodemailer</div><div style="font-size:11px;color:var(--muted)">Gmail SMTP</div></div>
+      <div class="ov-card"><div class="ov-icon">📁</div><div class="ov-label">File Upload</div><div class="ov-val">Multer</div><div style="font-size:11px;color:var(--muted)">20MB limit</div></div>
+      <div class="ov-card"><div class="ov-icon">📈</div><div class="ov-label">Charts</div><div class="ov-val">Recharts</div><div style="font-size:11px;color:var(--muted)">React library</div></div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: FILE STRUCTURE -->
+  <div class="slide" id="s3">
+    <div class="tag">📂 Project Structure</div>
+    <h2 style="font-size:28px;color:var(--white);margin-bottom:20px;">Where Everything Lives</h2>
+    <div class="stack-row">
+      <div class="stack-col">
+        <h3>Backend — <span style="color:var(--muted)">C:\fyp\Backend\</span></h3>
+        <div class="stack-item"><div class="stack-dot"></div><div class="stack-name">server.js</div><div class="stack-role">Entry point, mounts all routes</div></div>
+        <div class="stack-item"><div class="stack-dot"></div><div class="stack-name">routes/auth.js</div><div class="stack-role">Login, register, OAuth</div></div>
+        <div class="stack-item"><div class="stack-dot"></div><div class="stack-name">routes/budgets.js</div><div class="stack-role">Budget CRUD + approvals</div></div>
+        <div class="stack-item"><div class="stack-dot"></div><div class="stack-name">routes/transactions.js</div><div class="stack-role">Transaction management</div></div>
+        <div class="stack-item"><div class="stack-dot"></div><div class="stack-name">routes/analytics.js</div><div class="stack-role">Dashboard, forecast, patterns</div></div>
+        <div class="stack-item"><div class="stack-dot"></div><div class="stack-name">routes/messages.js</div><div class="stack-role">Internal messaging</div></div>
+        <div class="stack-item"><div class="stack-dot"></div><div class="stack-name">routes/reports.js</div><div class="stack-role">Financial reports</div></div>
+        <div class="stack-item"><div class="stack-dot"></div><div class="stack-name">models/</div><div class="stack-role">12 Mongoose schemas</div></div>
+        <div class="stack-item"><div class="stack-dot"></div><div class="stack-name">services/emailService.js</div><div class="stack-role">HTML emails via Nodemailer</div></div>
+        <div class="stack-item"><div class="stack-dot"></div><div class="stack-name">services/aiService.js</div><div class="stack-role">Gemini AI integration</div></div>
+        <div class="stack-item"><div class="stack-dot"></div><div class="stack-name">middleware/auth.js</div><div class="stack-role">JWT verify + role guards</div></div>
+      </div>
+      <div class="stack-col">
+        <h3>Frontend — <span style="color:var(--muted)">C:\fyp\Frontain\src\</span></h3>
+        <div class="stack-item"><div class="stack-dot"></div><div class="stack-name">App.js</div><div class="stack-role">Routes + protected route guards</div></div>
+        <div class="stack-item"><div class="stack-dot"></div><div class="stack-name">context/AuthContext.js</div><div class="stack-role">Global auth state + permissions</div></div>
+        <div class="stack-item"><div class="stack-dot"></div><div class="stack-name">services/api.js</div><div class="stack-role">All Axios API calls</div></div>
+        <div class="stack-item"><div class="stack-dot"></div><div class="stack-name">pages/Dashboard.js</div><div class="stack-role">4 role-specific dashboards</div></div>
+        <div class="stack-item"><div class="stack-dot"></div><div class="stack-name">pages/BudgetsPage.js</div><div class="stack-role">Budget cards + CRUD modal</div></div>
+        <div class="stack-item"><div class="stack-dot"></div><div class="stack-name">pages/TransactionsPage.js</div><div class="stack-role">Transaction table + approve</div></div>
+        <div class="stack-item"><div class="stack-dot"></div><div class="stack-name">pages/AnalyticsPage.js</div><div class="stack-role">Charts + AI insights</div></div>
+        <div class="stack-item"><div class="stack-dot"></div><div class="stack-name">pages/MessagingPage.js</div><div class="stack-role">Real-time messaging UI</div></div>
+        <div class="stack-item"><div class="stack-dot"></div><div class="stack-name">pages/ReportsPage.js</div><div class="stack-role">Generate + view reports</div></div>
+        <div class="stack-item"><div class="stack-dot"></div><div class="stack-name">pages/BudgetApproval.js</div><div class="stack-role">3-stage approval workflow</div></div>
+        <div class="stack-item"><div class="stack-dot"></div><div class="stack-name">pages/LandingPage.js</div><div class="stack-role">Public landing page</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4: AUTHENTICATION -->
+  <div class="slide" id="s4">
+    <div class="tag">🔐 Feature 1 — Authentication</div>
+    <div class="fn-header">
+      <div class="fn-meta">
+        <h2 class="fn-title">Authentication System</h2>
+        <p class="fn-desc">Secure multi-method login with email verification, Google OAuth, password reset, and role-based JWT tokens.</p>
+      </div>
+    </div>
+    <div class="fn-body">
+      <div class="fn-panel">
+        <h4>📍 Where in Code</h4>
+        <ul class="fn-list">
+          <li><span class="file-ref">Backend/routes/auth.js</span> — all auth endpoints</li>
+          <li><span class="file-ref">Backend/config/passport.js</span> — Google OAuth strategy</li>
+          <li><span class="file-ref">Backend/middleware/auth.js</span> — verifyToken, role guards</li>
+          <li><span class="file-ref">Backend/models/EmailToken.js</span> — verify & reset tokens in DB</li>
+          <li><span class="file-ref">Frontend/context/AuthContext.js</span> — global login/logout state</li>
+          <li><span class="file-ref">Frontend/services/api.js → authAPI</span> — Axios calls</li>
+          <li><span class="file-ref">Frontend/pages/LoginPage.js</span> — login form UI</li>
+        </ul>
+      </div>
+      <div class="fn-panel">
+        <h4>🔀 API Routes</h4>
+        <div>
+          <span class="route-pill post">POST /api/auth/login</span>
+          <span class="route-pill post">POST /api/auth/register</span>
+          <span class="route-pill post">POST /api/auth/forgot-password</span>
+          <span class="route-pill post">POST /api/auth/reset-password</span>
+          <span class="route-pill get">GET /api/auth/google</span>
+          <span class="route-pill get">GET /api/auth/me</span>
+          <span class="route-pill get">GET /api/registration/verify-email/:token</span>
+          <span class="route-pill post">POST /api/registration/resend-verification</span>
+        </div>
+        <h4 style="margin-top:16px;">⚙️ How It Works</h4>
+        <ul class="fn-list">
+          <li>User registers → EmailToken saved in MongoDB → verify link sent</li>
+          <li>Login returns JWT stored in localStorage</li>
+          <li>Every API request sends <code style="font-family:monospace;font-size:11px;color:var(--accent)">Authorization: Bearer TOKEN</code></li>
+          <li>middleware/auth.js decodes token, reads role from live DB</li>
+          <li>Reset tokens stored in MongoDB — survive server restarts ✅</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5: ROLE-BASED ACCESS -->
+  <div class="slide" id="s5">
+    <div class="tag">👥 Feature 2 — Role-Based Access Control</div>
+    <h2 style="font-size:28px;color:var(--white);margin-bottom:8px;">4 User Roles · Different Permissions</h2>
+    <p style="color:var(--muted);font-size:13px;margin-bottom:20px;">Defined in <span class="file-ref">Frontend/context/AuthContext.js</span> and enforced in <span class="file-ref">Backend/middleware/auth.js</span></p>
+    <div class="roles-grid">
+      <div class="role-card" style="border-color:#f59e0b55">
+        <div class="role-name" style="color:#fbbf24;">👑 Admin</div>
+        <div class="role-perm yes">Manage all users</div>
+        <div class="role-perm yes">View all budgets</div>
+        <div class="role-perm yes">Approve transactions</div>
+        <div class="role-perm yes">Final budget approval</div>
+        <div class="role-perm yes">Activity logs</div>
+        <div class="role-perm yes">Full analytics</div>
+      </div>
+      <div class="role-card" style="border-color:#3b82f655">
+        <div class="role-name" style="color:#60a5fa;">💼 Finance Officer</div>
+        <div class="role-perm yes">Create budgets</div>
+        <div class="role-perm yes">Approve transactions</div>
+        <div class="role-perm yes">Review budget requests</div>
+        <div class="role-perm yes">Generate reports</div>
+        <div class="role-perm yes">View analytics</div>
+        <div class="role-perm no">Manage users</div>
+      </div>
+      <div class="role-card" style="border-color:#8b5cf655">
+        <div class="role-name" style="color:#a78bfa;">🏢 Department Head</div>
+        <div class="role-perm yes">Create transactions</div>
+        <div class="role-perm yes">Submit budget requests</div>
+        <div class="role-perm yes">View dept reports</div>
+        <div class="role-perm yes">Send messages</div>
+        <div class="role-perm no">Approve transactions</div>
+        <div class="role-perm no">Manage budgets</div>
+      </div>
+      <div class="role-card" style="border-color:#10b98155">
+        <div class="role-name" style="color:#34d399;">👁️ Viewer</div>
+        <div class="role-perm yes">View completed tx only</div>
+        <div class="role-perm yes">View public reports</div>
+        <div class="role-perm yes">Dashboard overview</div>
+        <div class="role-perm no">Create anything</div>
+        <div class="role-perm no">Approve anything</div>
+        <div class="role-perm no">Messaging</div>
+      </div>
+    </div>
+    <div style="margin-top:16px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 20px;max-width:760px;font-size:12px;color:var(--muted);">
+      <span style="color:var(--accent);font-family:monospace;">AuthContext.js</span> exports: <code style="font-family:monospace;color:var(--green-light)">canManageBudgets, canApproveBudgets, canCreateTransactions, canApproveTransactions, isViewerOnly</code> — used directly in every page to show/hide buttons
+    </div>
+  </div>
+
+  <!-- SLIDE 6: BUDGET MANAGEMENT -->
+  <div class="slide" id="s6">
+    <div class="tag">💰 Feature 3 — Budget Management</div>
+    <div class="fn-header">
+      <div class="fn-meta">
+        <h2 class="fn-title">Budget Management</h2>
+        <p class="fn-desc">Create, track, and approve budgets by fiscal year and department with real-time utilization tracking and progress bars.</p>
+      </div>
+    </div>
+    <div class="fn-body">
+      <div class="fn-panel">
+        <h4>📍 Where in Code</h4>
+        <ul class="fn-list">
+          <li><span class="file-ref">Backend/routes/budgets.js</span> — all budget logic</li>
+          <li><span class="file-ref">Backend/models/Budget.js</span> — Mongoose schema</li>
+          <li><span class="file-ref">Backend/models/BudgetAllocation.js</span> — category allocations</li>
+          <li><span class="file-ref">Frontend/pages/BudgetsPage.js</span> — cards + modal UI</li>
+          <li><span class="file-ref">Frontend/services/api.js → budgetsAPI</span> — axios calls</li>
+        </ul>
+        <h4 style="margin-top:14px;">⚙️ Key Functions in BudgetsPage.js</h4>
+        <ul class="fn-list">
+          <li><code style="font-family:monospace;font-size:11px;color:var(--accent)">openCreate()</code> — opens blank modal for new budget</li>
+          <li><code style="font-family:monospace;font-size:11px;color:var(--accent)">openEdit(budget)</code> — pre-fills modal from existing budget</li>
+          <li><code style="font-family:monospace;font-size:11px;color:var(--accent)">handleCreate(e)</code> — POSTs to /api/budgets</li>
+          <li><code style="font-family:monospace;font-size:11px;color:var(--accent)">handleApprove(id)</code> — POSTs to /api/budgets/:id/approve</li>
+          <li><code style="font-family:monospace;font-size:11px;color:var(--accent)">handleDelete(id)</code> — DELETE /api/budgets/:id</li>
+        </ul>
+      </div>
+      <div class="fn-panel">
+        <h4>🔀 API Routes</h4>
+        <div>
+          <span class="route-pill get">GET /api/budgets</span>
+          <span class="route-pill get">GET /api/budgets/:id</span>
+          <span class="route-pill post">POST /api/budgets</span>
+          <span class="route-pill put">PUT /api/budgets/:id</span>
+          <span class="route-pill del">DELETE /api/budgets/:id</span>
+          <span class="route-pill post">POST /api/budgets/:id/approve</span>
+          <span class="route-pill get">GET /api/budgets/meta/categories</span>
+          <span class="route-pill get">GET /api/budgets/stats/summary</span>
+        </div>
+        <h4 style="margin-top:16px;">📊 Status Flow</h4>
+        <div class="flow-row" style="margin-top:8px;">
+          <div class="flow-box">Draft</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box green">Active</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box">Closed</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box" style="color:var(--muted)">Archived</div>
+        </div>
+        <p style="font-size:12px;color:var(--muted);margin-top:10px;">Utilization % = spentAmount ÷ totalAmount × 100. Auto-updated when transactions are approved.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 7: TRANSACTIONS -->
+  <div class="slide" id="s7">
+    <div class="tag">💳 Feature 4 — Transactions</div>
+    <div class="fn-header">
+      <div class="fn-meta">
+        <h2 class="fn-title">Transaction Management</h2>
+        <p class="fn-desc">Multi-level approval workflow for income and expenses. On approval, budget spentAmount auto-updates and email notifications are sent.</p>
+      </div>
+    </div>
+    <div class="fn-body">
+      <div class="fn-panel">
+        <h4>📍 Where in Code</h4>
+        <ul class="fn-list">
+          <li><span class="file-ref">Backend/routes/transactions.js</span> — all transaction logic</li>
+          <li><span class="file-ref">Backend/models/Transaction.js</span> — Mongoose schema</li>
+          <li><span class="file-ref">Frontend/pages/TransactionsPage.js</span> — table + modal UI</li>
+          <li><span class="file-ref">Frontend/services/api.js → transactionsAPI</span></li>
+        </ul>
+        <h4 style="margin-top:14px;">⚙️ Key Backend Logic</h4>
+        <ul class="fn-list">
+          <li>On <strong>approve</strong>: status → 'completed', budget.spentAmount += amount</li>
+          <li>If utilization ≥ 80%: <span class="file-ref">emailService.sendBudgetAlert()</span> fires</li>
+          <li>Email sent to transaction creator via <span class="file-ref">sendTransactionApproved()</span></li>
+          <li>Viewer role: only sees completed transactions — enforced in both backend filter AND frontend render</li>
+        </ul>
+      </div>
+      <div class="fn-panel">
+        <h4>🔀 API Routes</h4>
+        <div>
+          <span class="route-pill get">GET /api/transactions</span>
+          <span class="route-pill get">GET /api/transactions/:id</span>
+          <span class="route-pill post">POST /api/transactions</span>
+          <span class="route-pill put">PUT /api/transactions/:id</span>
+          <span class="route-pill post">POST /api/transactions/:id/approve</span>
+          <span class="route-pill post">POST /api/transactions/:id/reject</span>
+          <span class="route-pill del">DELETE /api/transactions/:id</span>
+          <span class="route-pill get">GET /api/transactions/stats/summary</span>
+        </div>
+        <h4 style="margin-top:16px;">📊 Approval Flow</h4>
+        <div class="flow-row" style="margin-top:8px;">
+          <div class="flow-box">Pending</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box green">Completed</div>
+          <div class="flow-arrow">/ or /</div>
+          <div class="flow-box red">Cancelled</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 8: ANALYTICS + AI -->
+  <div class="slide" id="s8">
+    <div class="tag">📊 Feature 5 — Analytics & AI Forecasting</div>
+    <div class="fn-header">
+      <div class="fn-meta">
+        <h2 class="fn-title">Analytics & AI Forecasting</h2>
+        <p class="fn-desc">Real-time dashboard, deterministic linear regression forecasting, spending patterns, and Google Gemini AI insights.</p>
+      </div>
+    </div>
+    <div class="fn-body">
+      <div class="fn-panel">
+        <h4>📍 Where in Code</h4>
+        <ul class="fn-list">
+          <li><span class="file-ref">Backend/routes/analytics.js</span> — 6 endpoints</li>
+          <li><span class="file-ref">Backend/services/aiService.js</span> — Gemini API calls</li>
+          <li><span class="file-ref">Frontend/pages/AnalyticsPage.js</span> — charts & AI UI</li>
+        </ul>
+        <h4 style="margin-top:14px;">🤖 AI — aiService.js</h4>
+        <ul class="fn-list">
+          <li><code style="font-family:monospace;font-size:11px;color:var(--accent)">generateBudgetAnalysis()</code> — sends budget + last 15 transactions to Gemini, returns JSON: health, insights, risks, recommendations</li>
+          <li><code style="font-family:monospace;font-size:11px;color:var(--accent)">generateOrganizationInsights()</code> — sends full org summary to Gemini, returns: top insights, alerts, best/worst dept</li>
+          <li>Uses Node.js built-in <code style="font-family:monospace;font-size:11px;">https</code> — no extra npm package needed</li>
+        </ul>
+      </div>
+      <div class="fn-panel">
+        <h4>🔀 API Routes</h4>
+        <div>
+          <span class="route-pill get">GET /api/analytics/dashboard</span>
+          <span class="route-pill get">GET /api/analytics/forecast</span>
+          <span class="route-pill get">GET /api/analytics/spending-patterns</span>
+          <span class="route-pill get">GET /api/analytics/comparison</span>
+          <span class="route-pill post">POST /api/analytics/ai-budget-analysis</span>
+          <span class="route-pill post">POST /api/analytics/ai-organization-insights</span>
+        </div>
+        <h4 style="margin-top:16px;">📐 Forecast Algorithm</h4>
+        <ul class="fn-list">
+          <li>Groups completed expenses into monthly buckets</li>
+          <li>Applies <strong>linear regression</strong> (least-squares): y = a + bx</li>
+          <li>Projects next N months — fully deterministic, no random values</li>
+          <li>Returns trend: increasing / decreasing / stable</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 9: MESSAGING -->
+  <div class="slide" id="s9">
+    <div class="tag">💬 Feature 6 — Internal Messaging</div>
+    <div class="fn-header">
+      <div class="fn-meta">
+        <h2 class="fn-title">Internal Messaging System</h2>
+        <p class="fn-desc">Direct messaging between users with file attachments (images, PDF, Word, MP4), read receipts, conversation threads, and in-app notifications.</p>
+      </div>
+    </div>
+    <div class="fn-body">
+      <div class="fn-panel">
+        <h4>📍 Where in Code</h4>
+        <ul class="fn-list">
+          <li><span class="file-ref">Backend/routes/messages.js</span> — all message logic</li>
+          <li><span class="file-ref">Backend/models/Message.js</span> — Mongoose schema with attachments array</li>
+          <li><span class="file-ref">Backend/uploads/messages/</span> — file storage on disk</li>
+          <li><span class="file-ref">Frontend/pages/MessagingPage.js</span> — conversations + threads UI</li>
+        </ul>
+        <h4 style="margin-top:14px;">⚙️ Key Functions</h4>
+        <ul class="fn-list">
+          <li><code style="font-family:monospace;font-size:11px;color:var(--accent)">GET /conversations</code> — groups all messages by user partner</li>
+          <li><code style="font-family:monospace;font-size:11px;color:var(--accent)">GET /thread/:userId</code> — fetches full thread, auto-marks received as read</li>
+          <li><code style="font-family:monospace;font-size:11px;color:var(--accent)">POST /</code> — sends message + uploads files via Multer</li>
+          <li>On send: creates Notification record for recipient</li>
+          <li>On delete: removes physical file from disk too</li>
+        </ul>
+      </div>
+      <div class="fn-panel">
+        <h4>🔀 API Routes</h4>
+        <div>
+          <span class="route-pill get">GET /api/messages</span>
+          <span class="route-pill get">GET /api/messages/conversations</span>
+          <span class="route-pill get">GET /api/messages/thread/:userId</span>
+          <span class="route-pill get">GET /api/messages/unread/count</span>
+          <span class="route-pill get">GET /api/messages/attachment/:filename</span>
+          <span class="route-pill post">POST /api/messages</span>
+          <span class="route-pill put">PUT /api/messages/:id/read</span>
+          <span class="route-pill del">DELETE /api/messages/:id</span>
+        </div>
+        <h4 style="margin-top:16px;">📎 File Upload (Multer)</h4>
+        <ul class="fn-list">
+          <li>Max 5 attachments per message, 20MB each</li>
+          <li>Allowed: images, PDF, Word docs, MP4/WebM/MOV</li>
+          <li>Stored with UUID filename to avoid conflicts</li>
+          <li>Served via authenticated <code style="font-family:monospace;font-size:11px;">/attachment/:filename</code> endpoint</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 10: REPORTS + EMAIL -->
+  <div class="slide" id="s10">
+    <div class="tag">📈 Feature 7 & 8 — Reports & Email Service</div>
+    <div class="fn-header">
+      <div class="fn-meta">
+        <h2 class="fn-title">Reports & Email Notifications</h2>
+        <p class="fn-desc">4 report types generated from live DB data. Beautiful HTML emails sent automatically for key events.</p>
+      </div>
+    </div>
+    <div class="fn-body">
+      <div class="fn-panel">
+        <h4>📍 Reports — Where in Code</h4>
+        <ul class="fn-list">
+          <li><span class="file-ref">Backend/routes/reports.js</span> — 4 report endpoints</li>
+          <li><span class="file-ref">Frontend/pages/ReportsPage.js</span> — report UI</li>
+          <li><span class="file-ref">Frontend/services/api.js → reportsAPI</span></li>
+        </ul>
+        <h4 style="margin-top:14px;">📄 Report Types</h4>
+        <div>
+          <span class="route-pill get">GET /reports/financial</span>
+          <span class="route-pill get">GET /reports/budget-performance</span>
+          <span class="route-pill get">GET /reports/department-wise</span>
+          <span class="route-pill get">GET /reports/expense-trends</span>
+        </div>
+        <ul class="fn-list" style="margin-top:10px;">
+          <li>Financial: income, expense, category & department breakdown, monthly trend</li>
+          <li>Budget Performance: utilization rate, overspent/healthy/warning status per budget</li>
+          <li>Department-wise: per-department budget, spending, transaction count</li>
+          <li>Expense Trends: 6-month rolling data, top 5 categories</li>
+        </ul>
+      </div>
+      <div class="fn-panel">
+        <h4>📧 Email — Where in Code</h4>
+        <ul class="fn-list">
+          <li><span class="file-ref">Backend/services/emailService.js</span> — all email templates</li>
+          <li>Configured via Gmail SMTP in <span class="file-ref">Backend/.env</span></li>
+          <li>If SMTP not set: silently logs to console — no crash</li>
+        </ul>
+        <h4 style="margin-top:14px;">✉️ Email Events</h4>
+        <ul class="fn-list">
+          <li><code style="font-family:monospace;font-size:11px;color:var(--accent)">sendVerificationEmail()</code> — on register</li>
+          <li><code style="font-family:monospace;font-size:11px;color:var(--accent)">sendPasswordResetEmail()</code> — on forgot password</li>
+          <li><code style="font-family:monospace;font-size:11px;color:var(--accent)">sendWelcomeEmail()</code> — after email verified</li>
+          <li><code style="font-family:monospace;font-size:11px;color:var(--accent)">sendTransactionApproved/Rejected()</code> — on approval</li>
+          <li><code style="font-family:monospace;font-size:11px;color:var(--accent)">sendBudgetAlert()</code> — when ≥80% budget used</li>
+          <li><code style="font-family:monospace;font-size:11px;color:var(--accent)">sendBudgetApproved()</code> — on budget approval</li>
+          <li><code style="font-family:monospace;font-size:11px;color:var(--accent)">sendGoogleLoginEmail()</code> — on Google sign-in</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 11: BUG FIXES -->
+  <div class="slide" id="s11">
+    <div class="tag">🐛 Bug Fixes — Done During Development</div>
+    <h2 style="font-size:28px;color:var(--white);margin-bottom:20px;">5 Bugs Found & Fixed</h2>
+    <div class="bug-list">
+      <div class="bug-item">
+        <div class="bug-num">FIX 1</div>
+        <div>
+          <div class="bug-title">Comment author name was always blank</div>
+          <div class="bug-fix">In <span class="file-ref">budgetApprovals.js</span>: auth middleware never sets req.user.firstName/lastName. Fixed by adding <code style="font-family:monospace;color:var(--accent)">getUserFullName(userId)</code> helper that fetches real name from MongoDB on each comment.</div>
+        </div>
+      </div>
+      <div class="bug-item">
+        <div class="bug-num">FIX 2</div>
+        <div>
+          <div class="bug-title">Password reset tokens lost on every server restart</div>
+          <div class="bug-fix">In <span class="file-ref">auth.js</span>: tokens were in a plain JS object (memory). Fixed by saving to MongoDB using existing <span class="file-ref">EmailToken</span> model — tokens now survive restarts, auto-expire after 1 hour via MongoDB TTL index.</div>
+        </div>
+      </div>
+      <div class="bug-item">
+        <div class="bug-num">FIX 3</div>
+        <div>
+          <div class="bug-title">Budget forecast gave different results every call</div>
+          <div class="bug-fix">In <span class="file-ref">analytics.js</span>: <code style="font-family:monospace;color:var(--accent)">Math.random()</code> was used for variance. Replaced with proper deterministic linear regression (least-squares method) — same data always gives same forecast.</div>
+        </div>
+      </div>
+      <div class="bug-item">
+        <div class="bug-num">FIX 4</div>
+        <div>
+          <div class="bug-title">ObjectId string mismatch in analytics queries</div>
+          <div class="bug-fix">In <span class="file-ref">analytics.js</span>: departmentId/categoryId passed as raw strings into MongoDB queries. Fixed with <code style="font-family:monospace;color:var(--accent)">toObjId()</code> helper using <code style="font-family:monospace;font-size:11px;">mongoose.Types.ObjectId</code>.</div>
+        </div>
+      </div>
+      <div class="bug-item">
+        <div class="bug-num">FIX 5</div>
+        <div>
+          <div class="bug-title">Secrets exposed — no .gitignore existed</div>
+          <div class="bug-fix">Created <span class="file-ref">.gitignore</span> at project root. Now excludes all .env files (Gmail password, Google OAuth secret, Gemini API key), node_modules, build output, and user uploads.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 12: WHAT'S DONE -->
+  <div class="slide" id="sfinal">
+    <div class="tag">✅ Summary — What Is Complete</div>
+    <h2 style="font-size:32px;color:var(--white);margin-bottom:4px;">Everything Done So Far</h2>
+    <p style="color:var(--muted);font-size:14px;">All core features implemented and bugs fixed</p>
+    <div class="done-grid">
+      <div class="done-item"><div class="done-icon">🔐</div>JWT Auth + Google OAuth + Email Verification</div>
+      <div class="done-item"><div class="done-icon">👥</div>4 Role-Based Access Levels (Admin/Finance/Dept/Viewer)</div>
+      <div class="done-item"><div class="done-icon">💰</div>Budget CRUD + Category Allocations + Approval</div>
+      <div class="done-item"><div class="done-icon">💳</div>Transaction Tracking + Multi-Level Approval Flow</div>
+      <div class="done-item"><div class="done-icon">📊</div>4 Role-Specific Dashboards with Live Charts</div>
+      <div class="done-item"><div class="done-icon">🤖</div>AI Forecasting (Linear Regression) + Gemini Insights</div>
+      <div class="done-item"><div class="done-icon">💬</div>Internal Messaging + File Attachments + Read Receipts</div>
+      <div class="done-item"><div class="done-icon">📈</div>4 Report Types (Financial, Budget, Dept, Trends)</div>
+      <div class="done-item"><div class="done-icon">📧</div>Automated HTML Emails for All Key Events</div>
+      <div class="done-item"><div class="done-icon">📋</div>3-Stage Budget Approval Workflow</div>
+      <div class="done-item"><div class="done-icon">🛡️</div>5 Bugs Fixed · .gitignore · Secrets Protected</div>
+      <div class="done-item"><div class="done-icon">🗄️</div>MongoDB Atlas Cloud + 12 Mongoose Models</div>
+    </div>
+    <p style="margin-top:20px;font-size:12px;color:var(--border);">Planned for Phase 2: PDF export · 2FA · WebSocket notifications · Mobile app</p>
+  </div>
+
+</div><!-- /slides -->
+
+<!-- NAV -->
+<div class="nav">
+  <button id="prevBtn" onclick="go(-1)" disabled>← Prev</button>
+  <div class="dots" id="dots"></div>
+  <span class="slide-count" id="countTxt">1 / 12</span>
+  <button id="nextBtn" onclick="go(1)">Next →</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const titles = [
+    'TITLE', 'OVERVIEW', 'STRUCTURE', 'AUTH', 'ROLES',
+    'BUDGETS', 'TRANSACTIONS', 'ANALYTICS & AI',
+    'MESSAGING', 'REPORTS & EMAIL', 'BUG FIXES', 'SUMMARY'
+  ];
+  let cur = 0;
+  const total = slides.length;
+
+  const dotsEl  = document.getElementById('dots');
+  const countEl = document.getElementById('countTxt');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const prog    = document.getElementById('progress');
+  const titleEl = document.getElementById('slideTitle');
+  const numEl   = document.getElementById('slideNum');
+
+  // Build dots
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => goTo(i);
+    dotsEl.appendChild(d);
+  });
+
+  function goTo(n) {
+    slides[cur].classList.remove('active');
+    dotsEl.children[cur].classList.remove('active');
+    cur = n;
+    slides[cur].classList.add('active');
+    dotsEl.children[cur].classList.add('active');
+    countEl.textContent = `${cur + 1} / ${total}`;
+    numEl.textContent   = String(cur + 1).padStart(2, '0') + ' / ' + String(total).padStart(2, '0');
+    titleEl.textContent = 'BUDMAP · ' + titles[cur];
+    prevBtn.disabled = cur === 0;
+    nextBtn.disabled = cur === total - 1;
+    prog.style.width = ((cur + 1) / total * 100) + '%';
+  }
+
+  function go(dir) { if (cur + dir >= 0 && cur + dir < total) goTo(cur + dir); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') go(1);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   go(-1);
+  });
+
+  // init
+  goTo(0);
+</script>
+</body>
+</html>

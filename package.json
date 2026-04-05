@@ -1,0 +1,17 @@
+{
+  "name": "budmap",
+  "version": "1.0.0",
+  "description": "BudMap - Budget Allocation Application for SMEs, NGOs, and Educational Institutions",
+  "scripts": {
+    "start": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd Backend && npm start",
+    "client": "cd Frontain && npm start",
+    "install-all": "npm install && cd Backend && npm install && cd ../Frontain && npm install"
+  },
+  "keywords": ["budget", "finance", "management", "nepal"],
+  "author": "Reazon Koirala",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

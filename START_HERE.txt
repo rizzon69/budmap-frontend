@@ -1,0 +1,33 @@
+# 🚀 BudMap — How to Start
+
+## ✅ Correct folders to use:
+
+| Folder | What it is | Port |
+|--------|-----------|------|
+| `C:\fyp\Backend\` | Node.js + MongoDB backend | 5000 |
+| `C:\fyp\Frontain\` | React frontend (Create React App) | 3000 |
+
+## ▶️ Start commands:
+
+```bash
+# Terminal 1 — Backend
+cd C:\fyp\Backend
+npm start
+
+# Terminal 2 — Frontend
+cd C:\fyp\Frontain
+npm start
+
+# Then open: http://localhost:3000
+```
+
+---
+
+## ⛔ Folders to IGNORE (deprecated prototypes):
+
+| Folder | Why ignored |
+|--------|------------|
+| `budmap-frontend/` | Old Vite prototype → wrong backend (port 8080, Spring Boot) |
+| `budmap-backend/` | Old Spring Boot/Java backend → not connected to real app |
+
+These can be deleted safely. They have been disabled and will throw errors if run.

@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Environment variables — NEVER commit these
+.env
+Backend/.env
+Frontain/.env
+Frontend/.env
+*.env.local
+*.env.*.local
+
+# Build output
+build/
+dist/
+Frontain/build/
+Frontend/build/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Uploaded files (user data — do not commit)
+Backend/uploads/messages/
+
+# Test coverage
+coverage/
