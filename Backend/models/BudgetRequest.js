@@ -10,6 +10,7 @@ const budgetRequestSchema = new mongoose.Schema({
   totalAmount: { type: Number, required: true },
   allocations: [{
     categoryId: { type: mongoose.Schema.Types.ObjectId, ref: 'BudgetCategory' },
+    allocatedAmount: { type: Number },
     amount: { type: Number },
     notes: { type: String, default: null }
   }],

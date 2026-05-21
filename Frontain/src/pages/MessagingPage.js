@@ -25,6 +25,14 @@ const fullName  = (u) => u ? `${u.firstName || ''} ${u.lastName || ''}`.trim() :
 const initials  = (u) => u ? `${(u.firstName||'')[0]||''}${(u.lastName||'')[0]||''}`.toUpperCase() : '?';
 const fmtSize   = (b) => b < 1024 ? `${b} B` : b < 1048576 ? `${(b/1024).toFixed(1)} KB` : `${(b/1048576).toFixed(1)} MB`;
 
+// Append JWT token as query param so browsers can load images/files directly
+const withToken = (url) => {
+  const token = localStorage.getItem('budmap_token');
+  if (!token || !url) return url;
+  const sep = url.includes('?') ? '&' : '?';
+  return `${url}${sep}token=${encodeURIComponent(token)}`;
+};
+
 const AVATAR_COLORS = [
   ['#dcfce7','#16a34a'], ['#dbeafe','#2563eb'], ['#fef3c7','#d97706'],
   ['#f3e8ff','#7c3aed'], ['#fce7f3','#db2777'], ['#e0f2fe','#0284c7'],
@@ -66,7 +74,8 @@ const RoleBadge = ({ role }) => {
 
 // ── Attachment renderer ───────────────────────────────────────────────────────
 const Attachment = ({ att, mine }) => {
-  const url      = att.url?.startsWith('http') ? att.url : `${API_BASE}${att.url}`;
+  const rawUrl   = att.url?.startsWith('http') ? att.url : `${API_BASE}${att.url}`;
+  const url      = withToken(rawUrl);   // add ?token=... so browsers can load it
   const isImage  = att.mimetype?.startsWith('image/');
   const isVideo  = att.mimetype?.startsWith('video/');
   const isPDF    = att.mimetype === 'application/pdf';
@@ -163,7 +172,7 @@ const FilePicker = ({ files, setFiles }) => {
 // ════════════════════════════════════════════════════════════════════════════════
 export default function MessagingPage() {
   const { user } = useAuth();
-  const myId = String(user?._id || user?.id || '');
+  const myId = user?.userId || String(user?._id || user?.id || '');
 
   const [convos,  setConvos]  = useState([]);
   const [thread,  setThread]  = useState(null);
@@ -401,10 +410,8 @@ export default function MessagingPage() {
                   style={{ flex:1, background:'none', border:'none', outline:'none', fontSize:13, color:'#334155', fontFamily:'inherit' }}
                       onFocus={() => setUSearch(uSearch)} />
                   </div>
-                  {/* Show dropdown always when input is focused — even if empty (shows all) */}
                   {(uSearch !== null) && (
                   <div style={{ position:'absolute', top:'calc(100% + 4px)', left:0, right:0, zIndex:20, background:'white', borderRadius:12, boxShadow:'0 8px 30px rgba(0,0,0,0.12)', border:'1px solid #e2e8f0', overflow:'hidden', maxHeight:260, overflowY:'auto' }}>
-                  {/* Header */}
                   <div style={{ padding:'10px 16px 8px', borderBottom:'1px solid #f1f5f9', fontSize:11, fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'0.5px' }}>
                   {uSearch ? `Results for "${uSearch}"` : 'All Team Members'}
                   </div>

@@ -7,6 +7,58 @@ const Department = require('../models/Department');
 const Transaction = require('../models/Transaction');
 const { verifyToken, isFinanceOfficerOrAdmin, isDepartmentHeadOrHigher } = require('../middleware/auth');
 
+// Get budget categories — MUST be before /:id to avoid 'meta' being matched as an ID
+router.get('/meta/categories', verifyToken, async (req, res) => {
+  try {
+    const { type } = req.query;
+    const filter = {};
+    if (type) filter.type = type;
+    const categories = await BudgetCategory.find(filter).lean();
+    res.json({ success: true, data: { categories } });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to fetch categories', error: error.message });
+  }
+});
+
+// Get budget summary/statistics — MUST be before /:id
+router.get('/stats/summary', verifyToken, async (req, res) => {
+  try {
+    const mongoose = require('mongoose');
+    const rawId = req.query.organizationId || req.user.organizationId;
+    const orgId = rawId ? new mongoose.Types.ObjectId(rawId) : null;
+    if (!orgId) return res.json({ success: true, data: { summary: {}, categorySpending: [] } });
+    const orgBudgets = await Budget.find({ organizationId: orgId }).lean();
+    const activeBudgets = orgBudgets.filter(b => b.status === 'active');
+
+    const totalBudgeted = activeBudgets.reduce((sum, b) => sum + b.totalAmount, 0);
+    const totalSpent = activeBudgets.reduce((sum, b) => sum + b.spentAmount, 0);
+
+    const categories = await BudgetCategory.find().lean();
+    const categorySpending = await Promise.all(
+      categories.map(async (cat) => {
+        const allocs = await BudgetAllocation.find({ categoryId: cat._id }).lean();
+        const totalAllocated = allocs.reduce((sum, a) => sum + a.allocatedAmount, 0);
+        const totalSpentCat = allocs.reduce((sum, a) => sum + a.spentAmount, 0);
+        return { ...cat, allocated: totalAllocated, spent: totalSpentCat, remaining: totalAllocated - totalSpentCat };
+      })
+    );
+
+    res.json({
+      success: true,
+      data: {
+        summary: {
+          totalBudgets: orgBudgets.length, activeBudgets: activeBudgets.length,
+          totalBudgeted, totalSpent, totalRemaining: totalBudgeted - totalSpent,
+          utilizationPercentage: totalBudgeted > 0 ? Math.round((totalSpent / totalBudgeted) * 100) : 0
+        },
+        categorySpending: categorySpending.filter(c => c.allocated > 0)
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to fetch budget summary', error: error.message });
+  }
+});
+
 // Get all budgets
 router.get('/', verifyToken, async (req, res) => {
   try {
@@ -206,55 +258,6 @@ router.delete('/:id', verifyToken, isFinanceOfficerOrAdmin, async (req, res) => 
     res.json({ success: true, message: 'Budget deleted successfully' });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Failed to delete budget', error: error.message });
-  }
-});
-
-// Get budget categories
-router.get('/meta/categories', verifyToken, async (req, res) => {
-  try {
-    const { type } = req.query;
-    const filter = {};
-    if (type) filter.type = type;
-    const categories = await BudgetCategory.find(filter).lean();
-    res.json({ success: true, data: { categories } });
-  } catch (error) {
-    res.status(500).json({ success: false, message: 'Failed to fetch categories', error: error.message });
-  }
-});
-
-// Get budget summary/statistics
-router.get('/stats/summary', verifyToken, async (req, res) => {
-  try {
-    const orgId = req.query.organizationId || req.user.organizationId;
-    const orgBudgets = await Budget.find({ organizationId: orgId }).lean();
-    const activeBudgets = orgBudgets.filter(b => b.status === 'active');
-
-    const totalBudgeted = activeBudgets.reduce((sum, b) => sum + b.totalAmount, 0);
-    const totalSpent = activeBudgets.reduce((sum, b) => sum + b.spentAmount, 0);
-
-    const categories = await BudgetCategory.find().lean();
-    const categorySpending = await Promise.all(
-      categories.map(async (cat) => {
-        const allocs = await BudgetAllocation.find({ categoryId: cat._id }).lean();
-        const totalAllocated = allocs.reduce((sum, a) => sum + a.allocatedAmount, 0);
-        const totalSpentCat = allocs.reduce((sum, a) => sum + a.spentAmount, 0);
-        return { ...cat, allocated: totalAllocated, spent: totalSpentCat, remaining: totalAllocated - totalSpentCat };
-      })
-    );
-
-    res.json({
-      success: true,
-      data: {
-        summary: {
-          totalBudgets: orgBudgets.length, activeBudgets: activeBudgets.length,
-          totalBudgeted, totalSpent, totalRemaining: totalBudgeted - totalSpent,
-          utilizationPercentage: totalBudgeted > 0 ? Math.round((totalSpent / totalBudgeted) * 100) : 0
-        },
-        categorySpending: categorySpending.filter(c => c.allocated > 0)
-      }
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, message: 'Failed to fetch budget summary', error: error.message });
   }
 });
 

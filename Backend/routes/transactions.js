@@ -133,9 +133,13 @@ router.get('/', verifyToken, async (req, res) => {
       departmentId: t.departmentId?._id || t.departmentId,
     }));
 
-    const allFiltered  = await Transaction.find(filter).lean();
-    const totalIncome  = allFiltered.filter(t => t.type === 'income'  && t.status === 'completed').reduce((s, t) => s + t.amount, 0);
-    const totalExpense = allFiltered.filter(t => t.type === 'expense' && t.status === 'completed').reduce((s, t) => s + t.amount, 0);
+    // Compute summary using aggregation (single query, no full re-fetch)
+    const summaryAgg = await Transaction.aggregate([
+      { $match: { ...filter, status: 'completed' } },
+      { $group: { _id: '$type', total: { $sum: '$amount' } } }
+    ]);
+    const totalIncome  = summaryAgg.find(a => a._id === 'income')?.total  || 0;
+    const totalExpense = summaryAgg.find(a => a._id === 'expense')?.total || 0;
 
     res.json({
       success: true,

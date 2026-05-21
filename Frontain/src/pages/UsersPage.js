@@ -96,10 +96,10 @@ const UsersPage = () => {
 
   const handleDeactivate = async (id) => {
     if (!id && id !== 0) return;
-    
+    if (!window.confirm('Deactivate this user?')) return;
     try {
-      await usersAPI.delete(id);
-      setUsers(users.map(u => u.id === id ? { ...u, isActive: false } : u));
+      await usersAPI.update(id, { isActive: false });
+      setUsers(prev => prev.map(u => u.id === id ? { ...u, isActive: false } : u));
     } catch (error) {
       console.error('Failed to deactivate user:', error);
     }

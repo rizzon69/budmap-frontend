@@ -105,9 +105,13 @@ const TransactionsPage = () => {
       const res = await transactionsAPI.approve(id);
       if (res.data.success) {
         const updated = res.data.data.transaction;
-        setTransactions(transactions.map(t =>
-          getTransId(t) === getTransId(updated) ? updated : t
+        // Compare by string to handle mixed id/_id shapes
+        setTransactions(prev => prev.map(t =>
+          String(getTransId(t)) === String(getTransId(updated)) ? { ...t, ...updated } : t
         ));
+        // Refresh budgets so spentAmount stays in sync after approval
+        const budgetsRes = await budgetsAPI.getAll({ status: 'active' });
+        if (budgetsRes.data.success) setBudgets(budgetsRes.data.data.budgets || []);
       }
     } catch (error) {
       console.error('Failed to approve transaction:', error);
@@ -119,8 +123,8 @@ const TransactionsPage = () => {
       const res = await transactionsAPI.reject(id);
       if (res.data.success) {
         const updated = res.data.data.transaction;
-        setTransactions(transactions.map(t =>
-          getTransId(t) === getTransId(updated) ? updated : t
+        setTransactions(prev => prev.map(t =>
+          String(getTransId(t)) === String(getTransId(updated)) ? { ...t, ...updated } : t
         ));
       }
     } catch (error) {

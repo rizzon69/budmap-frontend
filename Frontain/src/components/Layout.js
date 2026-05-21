@@ -156,7 +156,7 @@ const Layout = ({ children }) => {
       <aside className={`sidebar ${sidebarOpen ? 'open' : 'closed'}`}>
         <div className="sidebar-header">
           <div className="logo">
-            <div className="logo-icon">💰</div>
+            <div className="logo-icon"><Wallet size={24} color="white" /></div>
             <span className="logo-text">BudMap</span>
           </div>
         </div>

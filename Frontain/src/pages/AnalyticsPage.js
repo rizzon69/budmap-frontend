@@ -121,7 +121,7 @@ export default function AnalyticsPage() {
         setAiError(res.data.message || 'AI analysis failed.');
       }
     } catch (e) {
-      setAiError(e.response?.data?.message || 'AI analysis failed. Make sure ANTHROPIC_API_KEY is set in .env');
+      setAiError(e.response?.data?.message || 'AI analysis failed. Make sure GEMINI_API_KEY is set in .env');
     } finally { setAiLoading(false); }
   };
 
@@ -146,7 +146,7 @@ export default function AnalyticsPage() {
         setAiOrgError(res.data.message || 'AI insights failed.');
       }
     } catch (e) {
-      setAiOrgError(e.response?.data?.message || 'AI insights failed. Make sure ANTHROPIC_API_KEY is set in .env');
+      setAiOrgError(e.response?.data?.message || 'AI insights failed. Make sure GEMINI_API_KEY is set in .env');
     } finally { setAiOrgLoading(false); }
   };
 

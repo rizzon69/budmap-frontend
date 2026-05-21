@@ -128,8 +128,7 @@ router.post('/user', async (req, res) => {
       success: true,
       message: 'Account created! Please verify your email before logging in.',
       data: { id: newUser._id, email: newUser.email, firstName: newUser.firstName, role: newUser.role },
-      // Always return link in dev so user can click it from the register success screen
-      verificationLink: link,
+      verificationLink: process.env.NODE_ENV === 'development' ? link : undefined,
     });
   } catch (err) {
     console.error('User registration error:', err);

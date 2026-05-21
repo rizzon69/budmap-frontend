@@ -8,6 +8,7 @@ const Transaction = require('../models/Transaction');
 const ActivityLog = require('../models/ActivityLog');
 const BudgetCategory = require('../models/BudgetCategory');
 const { verifyToken, isAdmin } = require('../middleware/auth');
+const SiteSettings = require('../models/SiteSettings');
 
 // Admin Dashboard Statistics
 router.get('/dashboard', verifyToken, isAdmin, async (req, res) => {
@@ -231,6 +232,62 @@ router.get('/settings', verifyToken, isAdmin, (req, res) => {
 // Update system settings (placeholder)
 router.put('/settings', verifyToken, isAdmin, (req, res) => {
   res.json({ success: true, message: 'Settings updated successfully', data: { settings: req.body } });
+});
+
+// ── Maintenance Mode ────────────────────────────────────────────────────────
+
+// GET /api/admin/maintenance — get maintenance status (admin only)
+router.get('/maintenance', verifyToken, isAdmin, async (req, res) => {
+  try {
+    const settings = await SiteSettings.get();
+    res.json({
+      success: true,
+      data: {
+        maintenanceMode: settings.maintenanceMode,
+        maintenanceMessage: settings.maintenanceMessage,
+        updatedAt: settings.updatedAt,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to fetch maintenance status', error: error.message });
+  }
+});
+
+// PUT /api/admin/maintenance — toggle maintenance mode (admin only)
+router.put('/maintenance', verifyToken, isAdmin, async (req, res) => {
+  try {
+    const { maintenanceMode, maintenanceMessage } = req.body;
+    const settings = await SiteSettings.get();
+
+    if (typeof maintenanceMode === 'boolean') {
+      settings.maintenanceMode = maintenanceMode;
+    }
+    if (maintenanceMessage !== undefined) {
+      settings.maintenanceMessage = maintenanceMessage;
+    }
+    settings.updatedBy = req.user.userId;
+    await settings.save();
+
+    // Log the action
+    await ActivityLog.create({
+      userId: req.user.userId,
+      action: maintenanceMode ? 'ENABLE' : 'DISABLE',
+      entity: 'Maintenance Mode',
+      entityId: settings._id.toString(),
+      details: `Maintenance mode ${settings.maintenanceMode ? 'enabled' : 'disabled'}`,
+    });
+
+    res.json({
+      success: true,
+      message: `Maintenance mode ${settings.maintenanceMode ? 'enabled' : 'disabled'} successfully`,
+      data: {
+        maintenanceMode: settings.maintenanceMode,
+        maintenanceMessage: settings.maintenanceMessage,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to update maintenance mode', error: error.message });
+  }
 });
 
 module.exports = router;

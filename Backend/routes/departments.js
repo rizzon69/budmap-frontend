@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const Department = require('../models/Department');
 const User = require('../models/User');
 const Budget = require('../models/Budget');
@@ -31,9 +32,9 @@ router.get('/', verifyToken, async (req, res) => {
 
     // Filter by organization
     if (organizationId) {
-      filter.organizationId = organizationId;
+      filter.organizationId = new mongoose.Types.ObjectId(organizationId);
     } else if (req.user.organizationId) {
-      filter.organizationId = req.user.organizationId;
+      filter.organizationId = new mongoose.Types.ObjectId(req.user.organizationId);
     }
 
     // Filter by active status

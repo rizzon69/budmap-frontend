@@ -292,7 +292,7 @@ const BudgetApproval = () => {
           </div>
         ) : (
           filteredRequests.map((request) => (
-            <div key={request.id} className="request-card">
+            <div key={request._id || request.id} className="request-card">
               <div className="request-header">
                 <div className="request-title-section">
                   <h3>{request.name}</h3>
@@ -303,7 +303,7 @@ const BudgetApproval = () => {
                 </div>
                 <button
                   className="btn-view"
-                  onClick={() => setSelectedRequest({...request, id: request._id || request.id})}
+                  onClick={() => setSelectedRequest({...request, id: request._id || request.id, _id: request._id || request.id})}
                 >
                   <Eye size={16} />
                   View Details
@@ -336,14 +336,14 @@ const BudgetApproval = () => {
                     <div className="quick-actions">
                       <button
                         className="btn-approve-sm"
-                        onClick={() => handleReview(request.id, 'approve', 'Quick approval')}
+                        onClick={() => handleReview(request._id || request.id, 'approve', 'Quick approval')}
                       >
                         <ThumbsUp size={16} />
                         Approve
                       </button>
                       <button
                         className="btn-reject-sm"
-                        onClick={() => handleReview(request.id, 'reject', 'Request rejected')}
+                        onClick={() => handleReview(request._id || request.id, 'reject', 'Request rejected')}
                       >
                         <ThumbsDown size={16} />
                         Reject
@@ -486,10 +486,10 @@ const BudgetApproval = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {selectedRequest.allocations.map((alloc, index) => (
+                      {(selectedRequest.allocations || []).map((alloc, index) => (
                         <tr key={index}>
                           <td>{alloc.categoryName}</td>
-                          <td className="amount">{formatCurrency(alloc.amount)}</td>
+                          <td className="amount">{formatCurrency(alloc.allocatedAmount || alloc.amount || 0)}</td>
                           <td>{alloc.notes}</td>
                         </tr>
                       ))}
@@ -502,10 +502,10 @@ const BudgetApproval = () => {
               <div className="detail-section">
                 <h3>Comments & Discussions</h3>
                 <div className="comments-list">
-                  {selectedRequest.comments.length === 0 ? (
+                  {(selectedRequest.comments || []).length === 0 ? (
                     <p className="empty-message">No comments yet</p>
                   ) : (
-                    selectedRequest.comments.map((c) => (
+                    (selectedRequest.comments || []).map((c) => (
                       <div key={c.id} className="comment-item">
                         <div className="comment-header">
                           <strong>{c.userName}</strong>
@@ -538,7 +538,7 @@ const BudgetApproval = () => {
               <div className="detail-section">
                 <h3>Approval History</h3>
                 <div className="history-timeline">
-                  {selectedRequest.history.map((h, index) => (
+                  {(selectedRequest.history || []).map((h, index) => (
                     <div key={index} className="timeline-item">
                       <div className="timeline-dot"></div>
                       <div className="timeline-content">

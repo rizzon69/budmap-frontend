@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { adminAPI } from '../services/api';
-import { Building2, Bell, Shield, Database, Save, CheckCircle } from 'lucide-react';
+import { Building2, Bell, Shield, Database, Save, CheckCircle, AlertTriangle, X } from 'lucide-react';
 import './PageStyles.css';
 import './SettingsPage.css';
 
@@ -9,6 +9,10 @@ const SettingsPage = () => {
   const { user, organization } = useAuth();
   const [activeTab, setActiveTab] = useState('general');
   const [saved, setSaved] = useState(false);
+  const [maintenanceMode, setMaintenanceMode] = useState(false);
+  const [maintenanceMessage, setMaintenanceMessage] = useState('');
+  const [maintenanceLoading, setMaintenanceLoading] = useState(false);
+  const [confirmModal, setConfirmModal] = useState(null);
   const [settings, setSettings] = useState({
     organizationName: organization?.name || '',
     organizationType: organization?.type || 'NGO',
@@ -27,6 +31,48 @@ const SettingsPage = () => {
     dateFormat: 'DD/MM/YYYY',
     language: 'English',
   });
+
+  // Load maintenance status on mount
+  useEffect(() => {
+    if (user?.role === 'admin') {
+      adminAPI.getMaintenance()
+        .then((res) => {
+          if (res.data.success) {
+            setMaintenanceMode(res.data.data.maintenanceMode);
+            setMaintenanceMessage(res.data.data.maintenanceMessage || '');
+          }
+        })
+        .catch(() => {});
+    }
+  }, [user]);
+
+  const toggleMaintenance = () => {
+    const newValue = !maintenanceMode;
+    setConfirmModal({
+      title: newValue ? 'Enable Maintenance Mode' : 'Disable Maintenance Mode',
+      message: newValue
+        ? 'All non-admin users will be locked out immediately. Only administrators will be able to access the system.'
+        : 'All users will regain access to the system immediately.',
+      type: newValue ? 'danger' : 'success',
+      confirmLabel: newValue ? 'Enable' : 'Disable',
+      onConfirm: async () => {
+        setConfirmModal(null);
+        setMaintenanceLoading(true);
+        try {
+          const res = await adminAPI.updateMaintenance({
+            maintenanceMode: newValue,
+            maintenanceMessage: maintenanceMessage || undefined,
+          });
+          if (res.data.success) {
+            setMaintenanceMode(res.data.data.maintenanceMode);
+          }
+        } catch (err) {
+          console.error('Failed to toggle maintenance:', err);
+        }
+        setMaintenanceLoading(false);
+      },
+    });
+  };
 
   const handleChange = (field, value) => {
     setSettings((prev) => ({ ...prev, [field]: value }));
@@ -228,6 +274,49 @@ const SettingsPage = () => {
                   </select>
                 </div>
               </div>
+
+              {/* Maintenance Mode */}
+              {user?.role === 'admin' && (
+                <div className={`maintenance-card ${maintenanceMode ? 'active' : ''}`}>
+                  <div className="maintenance-header">
+                    <div className="maintenance-title">
+                      <AlertTriangle size={20} />
+                      <div>
+                        <h4>Maintenance Mode</h4>
+                        <p>When enabled, only admins can access the system. All other users will see a maintenance page.</p>
+                      </div>
+                    </div>
+                    <button
+                      className={`maintenance-toggle-btn ${maintenanceMode ? 'on' : ''}`}
+                      onClick={toggleMaintenance}
+                      disabled={maintenanceLoading}
+                    >
+                      {maintenanceLoading ? 'Updating...' : maintenanceMode ? 'ON' : 'OFF'}
+                    </button>
+                  </div>
+                  <div className="input-group" style={{ marginTop: 12, marginBottom: 0 }}>
+                    <label className="input-label">Maintenance Message</label>
+                    <input
+                      className="input-field"
+                      type="text"
+                      placeholder="The system is currently under maintenance..."
+                      value={maintenanceMessage}
+                      onChange={(e) => setMaintenanceMessage(e.target.value)}
+                      onBlur={() => {
+                        if (maintenanceMode) {
+                          adminAPI.updateMaintenance({ maintenanceMode: true, maintenanceMessage }).catch(() => {});
+                        }
+                      }}
+                    />
+                  </div>
+                  {maintenanceMode && (
+                    <div className="maintenance-status-active">
+                      Maintenance is currently ACTIVE. Non-admin users cannot access the system.
+                    </div>
+                  )}
+                </div>
+              )}
+
               <div className="settings-info-box">
                 <p><strong>Database:</strong> MongoDB Atlas (Connected)</p>
                 <p><strong>Backend:</strong> Node.js + Express v2.0.0</p>
@@ -239,6 +328,33 @@ const SettingsPage = () => {
 
         </div>
       </div>
+
+      {/* Confirmation Modal */}
+      {confirmModal && (
+        <div className="confirm-overlay" onClick={() => setConfirmModal(null)}>
+          <div className="confirm-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="confirm-close" onClick={() => setConfirmModal(null)}>
+              <X size={18} />
+            </button>
+            <div className={`confirm-icon-wrap ${confirmModal.type}`}>
+              <AlertTriangle size={24} />
+            </div>
+            <h3 className="confirm-title">{confirmModal.title}</h3>
+            <p className="confirm-message">{confirmModal.message}</p>
+            <div className="confirm-actions">
+              <button className="confirm-cancel" onClick={() => setConfirmModal(null)}>
+                Cancel
+              </button>
+              <button
+                className={`confirm-btn ${confirmModal.type}`}
+                onClick={confirmModal.onConfirm}
+              >
+                {confirmModal.confirmLabel}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { adminAPI, transactionsAPI, budgetsAPI } from '../services/api';
 import api from '../services/api';
@@ -164,7 +164,7 @@ const AdminDashboard = ({ user }) => {
       <div className="activity-section">
         <div className="section-header">
           <h3>Recent Activity</h3>
-          <a href="/admin/activity-logs" className="view-all">View All →</a>
+          <Link to="/admin/activity-logs" className="view-all">View All →</Link>
         </div>
         <div className="activity-list">
           {recentActivity.length > 0 ? recentActivity.map((a, i) => (

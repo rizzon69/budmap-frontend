@@ -1,40 +1,38 @@
 /**
- * BudMap AI Service — Google Gemini (Free tier)
- * Uses the Gemini 1.5 Flash API to generate real AI financial insights.
+ * BudMap AI Service — Anthropic Claude
+ * Uses claude-sonnet-4-20250514 to generate real AI financial insights.
  * No npm package needed — uses Node built-in https.
  */
 
 const https = require('https');
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const MODEL = 'gemini-2.0-flash';
+const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
+const MODEL = 'claude-sonnet-4-20250514';
 
 /**
- * Call Google Gemini and return the text response.
+ * Call Anthropic Claude and return the text response.
  */
-function callGemini(prompt) {
+function callClaude(prompt) {
   return new Promise((resolve, reject) => {
-    if (!GEMINI_API_KEY || GEMINI_API_KEY === 'your-gemini-api-key-here') {
-      return reject(new Error('GEMINI_API_KEY not configured in .env'));
+    if (!ANTHROPIC_API_KEY || ANTHROPIC_API_KEY === 'your-claude-api-key-here') {
+      return reject(new Error('ANTHROPIC_API_KEY not configured in .env'));
     }
 
     const body = JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: {
-        temperature: 0.4,
-        maxOutputTokens: 1024,
-      },
+      model: MODEL,
+      max_tokens: 1024,
+      messages: [{ role: 'user', content: prompt }],
     });
 
-    const path = `/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`;
-
     const options = {
-      hostname: 'generativelanguage.googleapis.com',
-      path,
+      hostname: 'api.anthropic.com',
+      path: '/v1/messages',
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Content-Length': Buffer.byteLength(body),
+        'x-api-key': ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01',
       },
     };
 
@@ -45,10 +43,10 @@ function callGemini(prompt) {
         try {
           const parsed = JSON.parse(data);
           if (parsed.error) return reject(new Error(parsed.error.message));
-          const text = parsed.candidates?.[0]?.content?.parts?.[0]?.text || '';
+          const text = parsed.content?.[0]?.text || '';
           resolve(text);
         } catch (e) {
-          reject(new Error('Failed to parse Gemini response: ' + e.message));
+          reject(new Error('Failed to parse Claude response: ' + e.message));
         }
       });
     });
@@ -121,7 +119,7 @@ Respond with ONLY this JSON (no extra text):
   "summary": "2-3 sentence executive summary"
 }`;
 
-  const raw = await callGemini(prompt);
+  const raw = await callClaude(prompt);
   return JSON.parse(cleanJSON(raw));
 }
 
@@ -168,7 +166,7 @@ Respond with ONLY this JSON (no extra text):
   "executiveSummary": "3-4 sentence overview"
 }`;
 
-  const raw = await callGemini(prompt);
+  const raw = await callClaude(prompt);
   return JSON.parse(cleanJSON(raw));
 }
 

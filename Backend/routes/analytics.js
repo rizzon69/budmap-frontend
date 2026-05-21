@@ -18,14 +18,15 @@ router.get('/dashboard', auth, async (req, res) => {
     const user = req.user;
     const { fiscalYear, departmentId, startDate, endDate } = req.query;
 
-    const budgetFilter = { organizationId: user.organizationId };
-    const txFilter     = { organizationId: user.organizationId };
+    const budgetFilter = { organizationId: toObjId(user.organizationId) };
+    const txFilter     = { organizationId: toObjId(user.organizationId) };
 
     if (fiscalYear) budgetFilter.fiscalYear = fiscalYear;
 
     if (departmentId && user.role !== 'admin') {
-      budgetFilter.$or = [{ departmentId }, { departmentId: null }];
-      txFilter.$or     = [{ departmentId }, { departmentId: null }];
+      const dId = toObjId(departmentId);
+      budgetFilter.$or = [{ departmentId: dId }, { departmentId: null }];
+      txFilter.$or     = [{ departmentId: dId }, { departmentId: null }];
     }
 
     if (startDate && endDate) {
@@ -42,7 +43,7 @@ router.get('/dashboard', auth, async (req, res) => {
     const totalExpense = completedTx.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
 
     // Department-wise breakdown
-    const departments     = await Department.find({ organizationId: user.organizationId }).lean();
+    const departments     = await Department.find({ organizationId: toObjId(user.organizationId) }).lean();
     const departmentStats = await Promise.all(
       departments.map(async (dept) => {
         const deptBudgets    = filteredBudgets.filter(b => b.departmentId?.toString() === dept._id.toString());

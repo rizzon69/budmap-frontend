@@ -1,5 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+  Wallet, BarChart2, Shield, Users, TrendingUp, Search,
+  Bot, Bell, FileText, MessageSquare, DollarSign, Globe,
+  UserCheck, Smartphone, PieChart, X, Menu
+} from 'lucide-react';
 import './LandingPage.css';
 
 const LandingPage = () => {
@@ -20,7 +25,7 @@ const LandingPage = () => {
           </div>
           
           <div className="nav-menu-icon" onClick={toggleMenu}>
-            {menuOpen ? '✕' : '☰'}
+            {menuOpen ? <X size={20} /> : <Menu size={20} />}
           </div>
 
           <ul className={`nav-links ${menuOpen ? 'active' : ''}`}>
@@ -40,12 +45,12 @@ const LandingPage = () => {
           <div className="mobile-menu-content">
             <div className="mobile-menu-header">
               <h2>BudMap</h2>
-              <button className="close-btn" onClick={toggleMenu}>✕</button>
+              <button className="close-btn" onClick={toggleMenu}><X size={20} /></button>
             </div>
             
             <div className="mobile-menu-image">
               <div className="menu-placeholder-image">
-                <span>💰</span>
+                <Wallet size={40} />
               </div>
             </div>
 
@@ -88,32 +93,32 @@ const LandingPage = () => {
               <div className="phone-screen">
                 <div className="app-preview">
                   <div className="preview-header">
-                    <h4>💰 Budget Overview</h4>
+                    <h4><Wallet size={16} style={{marginRight:6,verticalAlign:'middle'}}/>Budget Overview</h4>
                   </div>
                   <div className="preview-item">
-                    <span>📊 Total Budget</span>
+                    <span><BarChart2 size={14} style={{marginRight:4,verticalAlign:'middle'}}/>Total Budget</span>
                     <span className="amount positive">NPR 5M</span>
                   </div>
                   <div className="preview-item">
-                    <span>💸 Spent</span>
+                    <span><DollarSign size={14} style={{marginRight:4,verticalAlign:'middle'}}/>Spent</span>
                     <span className="amount negative">NPR 1.85M</span>
                   </div>
                   <div className="preview-item">
-                    <span>💼 Department Budgets</span>
+                    <span><Users size={14} style={{marginRight:4,verticalAlign:'middle'}}/>Department Budgets</span>
                     <span className="amount">4</span>
                   </div>
                   <div className="preview-item">
-                    <span>📈 Monthly Summary</span>
+                    <span><TrendingUp size={14} style={{marginRight:4,verticalAlign:'middle'}}/>Monthly Summary</span>
                     <span className="badge">View</span>
                   </div>
                 </div>
               </div>
             </div>
             {/* Floating Money Icons */}
-            <div className="floating-icon icon-1">💵</div>
-            <div className="floating-icon icon-2">💰</div>
-            <div className="floating-icon icon-3">💸</div>
-            <div className="floating-icon icon-4">💴</div>
+            <div className="floating-icon icon-1"><DollarSign size={28} /></div>
+            <div className="floating-icon icon-2"><Wallet size={28} /></div>
+            <div className="floating-icon icon-3"><TrendingUp size={28} /></div>
+            <div className="floating-icon icon-4"><PieChart size={28} /></div>
           </div>
         </div>
       </section>
@@ -129,7 +134,7 @@ const LandingPage = () => {
           
           <div className="about-grid">
             <div className="about-card">
-              <div className="card-icon">🎯</div>
+              <div className="card-icon"><Globe size={28} /></div>
               <h3>Purpose-Built for Nepal</h3>
               <p>
                 Designed specifically for Nepalese organizations with features that align 
@@ -138,7 +143,7 @@ const LandingPage = () => {
             </div>
             
             <div className="about-card">
-              <div className="card-icon">📊</div>
+              <div className="card-icon"><BarChart2 size={28} /></div>
               <h3>Data-Driven Insights</h3>
               <p>
                 Make informed decisions with predictive analytics, visual dashboards, 
@@ -147,7 +152,7 @@ const LandingPage = () => {
             </div>
             
             <div className="about-card">
-              <div className="card-icon">🔒</div>
+              <div className="card-icon"><Shield size={28} /></div>
               <h3>Secure & Transparent</h3>
               <p>
                 Role-based access control ensures secure collaboration while maintaining 
@@ -168,49 +173,49 @@ const LandingPage = () => {
 
           <div className="features-grid">
             <div className="feature-card">
-              <div className="feature-icon">👥</div>
+              <div className="feature-icon"><Users size={28} /></div>
               <h3>User Management</h3>
               <p>Role-based access for admins, finance officers, department heads, and viewers.</p>
             </div>
 
             <div className="feature-card">
-              <div className="feature-icon">💰</div>
+              <div className="feature-icon"><Wallet size={28} /></div>
               <h3>Budget Creation</h3>
               <p>Create, update, and allocate funds to departments or projects with ease.</p>
             </div>
 
             <div className="feature-card">
-              <div className="feature-icon">📈</div>
+              <div className="feature-icon"><TrendingUp size={28} /></div>
               <h3>Real-Time Dashboards</h3>
               <p>Visual charts for income vs. expenses and budget performance tracking.</p>
             </div>
 
             <div className="feature-card">
-              <div className="feature-icon">🔍</div>
+              <div className="feature-icon"><Search size={28} /></div>
               <h3>Advanced Filtering</h3>
               <p>Search and filter budgets by fiscal year, department, category, or status.</p>
             </div>
 
             <div className="feature-card">
-              <div className="feature-icon">🤖</div>
+              <div className="feature-icon"><Bot size={28} /></div>
               <h3>Predictive Analytics</h3>
               <p>AI-based budget forecasting and recommendations based on spending patterns.</p>
             </div>
 
             <div className="feature-card">
-              <div className="feature-icon">🔔</div>
+              <div className="feature-icon"><Bell size={28} /></div>
               <h3>Smart Alerts</h3>
               <p>Get notified about overspending, low budgets, or approaching deadlines.</p>
             </div>
 
             <div className="feature-card">
-              <div className="feature-icon">📄</div>
+              <div className="feature-icon"><FileText size={28} /></div>
               <h3>Report Generation</h3>
               <p>Download customizable reports in multiple formats for stakeholders.</p>
             </div>
 
             <div className="feature-card">
-              <div className="feature-icon">💬</div>
+              <div className="feature-icon"><MessageSquare size={28} /></div>
               <h3>Internal Messaging</h3>
               <p>Collaborate with team members through built-in communication tools.</p>
             </div>
@@ -269,7 +274,7 @@ const LandingPage = () => {
           
           <div className="difference-grid">
             <div className="difference-card">
-              <h3>💵 Cost-Effective</h3>
+              <h3><DollarSign size={18} style={{verticalAlign:'middle',marginRight:6}}/> Cost-Effective</h3>
               <p>
                 Free and open-source, making it accessible for organizations with limited budgets. 
                 No expensive licensing fees or hidden costs.
@@ -277,7 +282,7 @@ const LandingPage = () => {
             </div>
 
             <div className="difference-card">
-              <h3>🇳🇵 Built for Nepal</h3>
+              <h3><Globe size={18} style={{verticalAlign:'middle',marginRight:6}}/> Built for Nepal</h3>
               <p>
                 Designed with Nepal's fiscal calendar, tax codes, and reporting requirements in mind. 
                 No more struggling with international tools that don't fit local needs.
@@ -285,7 +290,7 @@ const LandingPage = () => {
             </div>
 
             <div className="difference-card">
-              <h3>👨‍💼 Easy to Use</h3>
+              <h3><UserCheck size={18} style={{verticalAlign:'middle',marginRight:6}}/> Easy to Use</h3>
               <p>
                 User-friendly interface that works even for teams with limited digital skills. 
                 No steep learning curve or complex setup.
@@ -293,7 +298,7 @@ const LandingPage = () => {
             </div>
 
             <div className="difference-card">
-              <h3>🤝 Collaborative</h3>
+              <h3><Users size={18} style={{verticalAlign:'middle',marginRight:6}}/> Collaborative</h3>
               <p>
                 Role-based access allows seamless collaboration across departments while 
                 maintaining security and accountability.
@@ -301,7 +306,7 @@ const LandingPage = () => {
             </div>
 
             <div className="difference-card">
-              <h3>📱 Optimized Performance</h3>
+              <h3><Smartphone size={18} style={{verticalAlign:'middle',marginRight:6}}/> Optimized Performance</h3>
               <p>
                 Lightweight interface ensures usability even in areas with poor internet connectivity. 
                 Works smoothly on any device.
@@ -309,7 +314,7 @@ const LandingPage = () => {
             </div>
 
             <div className="difference-card">
-              <h3>📊 Data-Driven</h3>
+              <h3><PieChart size={18} style={{verticalAlign:'middle',marginRight:6}}/> Data-Driven</h3>
               <p>
                 Make decisions based on actual financial trends, not assumptions. 
                 Predictive analytics help you plan better.

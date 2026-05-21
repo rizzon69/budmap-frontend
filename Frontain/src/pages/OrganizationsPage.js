@@ -52,6 +52,7 @@ const OrganizationsPage = () => {
 
   const handleDelete = async (id) => {
     if (!id && id !== 0) return;
+    if (!window.confirm('Delete this organization? This cannot be undone.')) return;
     try {
       await organizationsAPI.delete(id);
       setOrganizations(prev => prev.filter(o => o.id !== id));

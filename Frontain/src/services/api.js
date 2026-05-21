@@ -41,6 +41,12 @@ api.interceptors.response.use(
       localStorage.removeItem('budmap_user');
       window.location.href = '/login';
     }
+
+    // Handle maintenance mode 503 — force reload so App picks up maintenance state
+    if (error.response?.status === 503 && error.response?.data?.maintenance) {
+      window.location.reload();
+    }
+
     return Promise.reject(error);
   }
 );
@@ -121,6 +127,8 @@ export const reportsAPI = {
   getBudgetPerformance: (params) => api.get('/reports/budget-performance', { params }),
   getDepartmentWise: (params) => api.get('/reports/department-wise', { params }),
   getExpenseTrends: (params) => api.get('/reports/expense-trends', { params }),
+  // Server-side PDF export — returns a blob for download
+  exportPDF: (body) => api.post('/reports/export-pdf', body, { responseType: 'blob' }),
 };
 
 // Notifications API
@@ -140,6 +148,11 @@ export const adminAPI = {
   getFinancialSummary: (params) => api.get('/admin/financial-summary', { params }),
   getSettings: () => api.get('/admin/settings'),
   updateSettings: (data) => api.put('/admin/settings', data),
+  getMaintenance: () => api.get('/admin/maintenance'),
+  updateMaintenance: (data) => api.put('/admin/maintenance', data),
 };
+
+// Public maintenance status (no auth needed)
+export const getMaintenanceStatus = () => api.get('/auth/maintenance');
 
 export default api;

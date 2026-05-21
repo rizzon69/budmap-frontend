@@ -60,7 +60,23 @@ const AdminDashboard = () => {
     }
   };
 
-  // No mock data — all data must come from the real database
+  const handleExportReport = async () => {
+    try {
+      const { reportsAPI } = await import('../services/api');
+      const res = await reportsAPI.exportPDF({ reportType: 'financial' });
+      const url  = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `BudMap_Admin_Report_${new Date().toISOString().split('T')[0]}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Export failed:', err);
+      alert('Export failed. Please try again.');
+    }
+  };
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-NP', {
@@ -122,7 +138,7 @@ const AdminDashboard = () => {
               <UserPlus size={18} />
               Add User
             </Link>
-            <button className="btn-secondary">
+            <button className="btn-secondary" onClick={handleExportReport}>
               <FileText size={18} />
               Export Report
             </button>

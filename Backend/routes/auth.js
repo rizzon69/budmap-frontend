@@ -14,6 +14,7 @@ const {
   sendGoogleLoginEmail
 } = require('../services/emailService');
 const EmailToken = require('../models/EmailToken');
+const SiteSettings = require('../models/SiteSettings');
 
 const makeToken = () => crypto.randomBytes(32).toString('hex');
 const BASE_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
@@ -145,6 +146,16 @@ router.post('/login', async (req, res) => {
       });
     }
 
+    // Block non-admin login during maintenance mode
+    const siteSettings = await SiteSettings.get();
+    if (siteSettings.maintenanceMode && user.role !== 'admin') {
+      return res.status(503).json({
+        success: false,
+        maintenance: true,
+        message: siteSettings.maintenanceMessage || 'The system is currently under maintenance. Only administrators can log in.',
+      });
+    }
+
     user.lastLogin = new Date();
     await user.save();
 
@@ -169,6 +180,22 @@ router.post('/login', async (req, res) => {
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ success: false, message: 'Login failed', error: error.message });
+  }
+});
+
+// ── Maintenance Status (public — no auth needed) ─────────────────────────────
+router.get('/maintenance', async (req, res) => {
+  try {
+    const settings = await SiteSettings.get();
+    res.json({
+      success: true,
+      data: {
+        maintenanceMode: settings.maintenanceMode,
+        message: settings.maintenanceMessage,
+      },
+    });
+  } catch (error) {
+    res.json({ success: true, data: { maintenanceMode: false, message: '' } });
   }
 });
 

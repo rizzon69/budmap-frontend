@@ -3,6 +3,7 @@ const router   = express.Router();
 const path     = require('path');
 const fs       = require('fs');
 const multer   = require('multer');
+const jwt      = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
 const { verifyToken: auth } = require('../middleware/auth');
 const Message      = require('../models/Message');
@@ -73,8 +74,31 @@ const notifyRecipient = async (recipientId, senderName, hasAttachments) => {
 };
 
 // ── GET /api/messages/attachment/:filename — serve uploaded file ──────────────
-router.get('/attachment/:filename', auth, (req, res) => {
-  const filePath = path.join(UPLOAD_DIR, req.params.filename);
+// Supports token via Authorization header OR ?token= query param
+// (browsers cannot send headers for <img src="..."> so query param support is required)
+router.get('/attachment/:filename', (req, res) => {
+  // Extract token from header or query param
+  let token = null;
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    token = authHeader.split(' ')[1];
+  } else if (req.query.token) {
+    token = req.query.token;
+  }
+
+  if (!token) {
+    return res.status(401).json({ success: false, message: 'Access denied. No token provided.' });
+  }
+
+  try {
+    jwt.verify(token, process.env.JWT_SECRET);
+  } catch (e) {
+    return res.status(401).json({ success: false, message: 'Invalid or expired token.' });
+  }
+
+  // Sanitize filename to prevent directory traversal
+  const filename = path.basename(req.params.filename);
+  const filePath = path.join(UPLOAD_DIR, filename);
   if (!fs.existsSync(filePath)) {
     return res.status(404).json({ success: false, message: 'File not found' });
   }
@@ -84,7 +108,7 @@ router.get('/attachment/:filename', auth, (req, res) => {
 // ── GET /api/messages/conversations ──────────────────────────────────────────
 router.get('/conversations', auth, async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user.userId;
 
     const allMessages = await Message.find({
       $or: [{ senderId: userId }, { recipientId: userId }]
@@ -120,7 +144,7 @@ router.get('/conversations', auth, async (req, res) => {
 // ── GET /api/messages/unread/count ────────────────────────────────────────────
 router.get('/unread/count', auth, async (req, res) => {
   try {
-    const count = await Message.countDocuments({ recipientId: req.user.id, readAt: null });
+    const count = await Message.countDocuments({ recipientId: req.user.userId, readAt: null });
     res.json({ success: true, data: { count } });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Failed to fetch unread count' });
@@ -130,7 +154,7 @@ router.get('/unread/count', auth, async (req, res) => {
 // ── GET /api/messages/thread/:userId ─────────────────────────────────────────
 router.get('/thread/:userId', auth, async (req, res) => {
   try {
-    const currentUserId = req.user.id;
+    const currentUserId = req.user.userId;
     const otherUserId   = req.params.userId;
 
     const thread = await Message.find({
@@ -159,7 +183,7 @@ router.get('/thread/:userId', auth, async (req, res) => {
 // ── POST /api/messages — send message (with optional file attachments) ────────
 router.post('/', auth, upload.array('attachments', 5), async (req, res) => {
   try {
-    const senderId = req.user.id;
+    const senderId = req.user.userId;
     const { recipientId, subject, body, parentId } = req.body;
 
     if (!recipientId) {
@@ -220,7 +244,7 @@ router.put('/:id/read', auth, async (req, res) => {
   try {
     const message = await Message.findById(req.params.id);
     if (!message) return res.status(404).json({ success: false, message: 'Message not found' });
-    if (message.recipientId.toString() !== req.user.id) {
+    if (message.recipientId.toString() !== req.user.userId) {
       return res.status(403).json({ success: false, message: 'Access denied' });
     }
     message.readAt = new Date();
@@ -237,7 +261,7 @@ router.delete('/:id', auth, async (req, res) => {
     const message = await Message.findById(req.params.id);
     if (!message) return res.status(404).json({ success: false, message: 'Message not found' });
 
-    const uid = req.user.id;
+    const uid = req.user.userId;
     if (message.senderId.toString() !== uid && message.recipientId.toString() !== uid) {
       return res.status(403).json({ success: false, message: 'Access denied' });
     }
@@ -258,7 +282,7 @@ router.delete('/:id', auth, async (req, res) => {
 // ── GET /api/messages — all messages for user ─────────────────────────────────
 router.get('/', auth, async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user.userId;
     const messages = await Message.find({
       $or: [{ senderId: userId }, { recipientId: userId }],
     })
@@ -283,8 +307,8 @@ router.get('/:id', auth, async (req, res) => {
 
     if (!message) return res.status(404).json({ success: false, message: 'Message not found' });
 
-    const uid = req.user.id;
-    const sId = message.senderId?._id?.toString() || message.senderId?.toString();
+    const uid = req.user.userId;
+    const sId = message.senderId?._id?.toString()    || message.senderId?.toString();
     const rId = message.recipientId?._id?.toString() || message.recipientId?.toString();
     if (sId !== uid && rId !== uid) {
       return res.status(403).json({ success: false, message: 'Access denied' });

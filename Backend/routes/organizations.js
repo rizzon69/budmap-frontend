@@ -51,6 +51,22 @@ router.get('/', verifyToken, isAdmin, async (req, res) => {
   }
 });
 
+// Get organization types — MUST be before /:id
+router.get('/meta/types', (req, res) => {
+  res.json({
+    success: true,
+    data: {
+      types: [
+        { value: 'ngo', label: 'Non-Governmental Organization (NGO)' },
+        { value: 'sme', label: 'Small & Medium Enterprise (SME)' },
+        { value: 'educational', label: 'Educational Institution' },
+        { value: 'government', label: 'Government Agency' },
+        { value: 'other', label: 'Other' }
+      ]
+    }
+  });
+});
+
 // Get organization by ID
 router.get('/:id', verifyToken, async (req, res) => {
   try {
@@ -157,22 +173,6 @@ router.delete('/:id', verifyToken, isAdmin, async (req, res) => {
   } catch (error) {
     res.status(500).json({ success: false, message: 'Failed to delete organization', error: error.message });
   }
-});
-
-// Get organization types
-router.get('/meta/types', (req, res) => {
-  res.json({
-    success: true,
-    data: {
-      types: [
-        { value: 'ngo', label: 'Non-Governmental Organization (NGO)' },
-        { value: 'sme', label: 'Small & Medium Enterprise (SME)' },
-        { value: 'educational', label: 'Educational Institution' },
-        { value: 'government', label: 'Government Agency' },
-        { value: 'other', label: 'Other' }
-      ]
-    }
-  });
 });
 
 module.exports = router;

@@ -398,7 +398,7 @@ const ReportsPage = () => {
     }
   };
 
-  // ── PDF Export ─────────────────────────────────────────────────────────
+  // ── Client-side PDF Export (jsPDF) ───────────────────────────────────────
   const handleExportPDF = async () => {
     const currentData = getCurrentData();
     if (!currentData) return;
@@ -409,7 +409,6 @@ const ReportsPage = () => {
 
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-      // jspdf-autotable attaches itself to jsPDF prototype automatically
 
       buildPDF(doc, reportType, currentData, user, organization);
 
@@ -425,8 +424,42 @@ const ReportsPage = () => {
       setExportSuccess(true);
       setTimeout(() => setExportSuccess(false), 3000);
     } catch (err) {
-      console.error('PDF export failed:', err);
-      alert('PDF export failed. Please make sure jspdf and jspdf-autotable are installed:\nnpm install jspdf jspdf-autotable');
+      console.error('Client PDF export failed:', err);
+      // Fallback to server-side export
+      handleServerExportPDF();
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  // ── Server-side PDF Export (PDFKit via backend) ───────────────────────────
+  const handleServerExportPDF = async () => {
+    const currentData = getCurrentData();
+    if (!currentData) return;
+
+    setExporting(true);
+    try {
+      const body = { reportType };
+      if (fiscalYear) body.fiscalYear = fiscalYear;
+      if (reportType === 'trends') body.months = months;
+
+      const res = await reportsAPI.exportPDF(body);
+      const url  = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
+      const link = document.createElement('a');
+      link.href = url;
+      const ts = new Date().toISOString().split('T')[0];
+      const titles = { financial: 'Financial_Report', budget: 'Budget_Performance', trends: 'Expense_Trends', department: 'Department_Report' };
+      link.setAttribute('download', `BudMap_${titles[reportType]}_${ts}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      setExportSuccess(true);
+      setTimeout(() => setExportSuccess(false), 3000);
+    } catch (err) {
+      console.error('Server PDF export failed:', err);
+      alert('PDF export failed. Please try again.');
     } finally {
       setExporting(false);
     }
@@ -475,6 +508,14 @@ const ReportsPage = () => {
               ? <RefreshCw size={16} style={{ animation: 'spin 1s linear infinite' }} />
               : <Download size={16} />}
             {exporting ? 'Generating…' : exportSuccess ? '✓ Downloaded!' : 'Export PDF'}
+          </button>
+          <button
+            className="btn btn-secondary"
+            onClick={handleServerExportPDF}
+            disabled={exporting || !getCurrentData()}
+            title="Server-side PDF (no internet needed)"
+          >
+            <Download size={16} /> Server PDF
           </button>
         </div>
       </div>
