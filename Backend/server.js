@@ -13,8 +13,20 @@ const { testEmailConnection } = require('./services/emailService');
 const app = express();
 
 // Middleware
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://budmap-frontend.vercel.app',
+  'https://budmap-frontend.onrender.com',
+  process.env.FRONTEND_URL,
+].filter(Boolean);
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, curl, Postman)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    callback(new Error('CORS: Origin not allowed — ' + origin));
+  },
   credentials: true
 }));
 app.use(express.json());
