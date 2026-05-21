@@ -1,23 +1,7 @@
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
-// Create reusable transporter
-const createTransporter = () => {
-  return nodemailer.createTransport({
-    host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-    port: parseInt(process.env.EMAIL_PORT) || 587,
-    secure: false,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASSWORD,
-    },
-    tls: { rejectUnauthorized: false }
-  });
-};
-
-// Guard — skip silently if email not configured
-const isConfigured = () =>
-  process.env.EMAIL_USER && process.env.EMAIL_USER !== 'your-email@gmail.com';
-
+const resend = new Resend(process.env.RESEND_API_KEY);
+const FROM = process.env.EMAIL_FROM || 'noreply@reazonkoirala.com.np';
 const BASE = process.env.FRONTEND_URL || 'http://localhost:3000';
 const YEAR = new Date().getFullYear();
 
@@ -51,25 +35,35 @@ const shell = (headerColor, title, body) => `
   .ftr{text-align:center;padding:18px 32px;color:#9ca3af;font-size:12px;border-top:1px solid #f3f4f6}
 </style></head><body>
 <div class="wrap">
-  <div class="hdr"><h1>💰 BudMap</h1><p>${title}</p></div>
+  <div class="hdr">
+    <h1>BudMap</h1>
+    <p>${title}</p>
+  </div>
   <div class="bd">${body}</div>
-  <div class="ftr">© ${YEAR} BudMap · Budget Management System · Nepal 🇳🇵<br>
+  <div class="ftr">
+    &copy; ${YEAR} BudMap &middot; Budget Management System &middot; Nepal<br>
     <a href="${BASE}" style="color:#10b981;text-decoration:none">Open BudMap</a>
   </div>
 </div></body></html>`;
 
+// ── core send ────────────────────────────────────────────────────────────────
 const send = async (to, subject, html) => {
-  if (!isConfigured()) {
-    console.log(`[Email] Not configured — skipping: ${subject} → ${to}`);
+  if (!process.env.RESEND_API_KEY) {
+    console.log(`[Email] RESEND_API_KEY not set — skipping: ${subject} → ${to}`);
     return { success: false };
   }
   try {
-    const t = createTransporter();
-    await t.sendMail({ from: `"BudMap" <${process.env.EMAIL_USER}>`, to, subject, html });
-    console.log(`[Email] ✅ Sent "${subject}" → ${to}`);
-    return { success: true };
+    const { data, error } = await resend.emails.send({
+      from: `BudMap <${FROM}>`,
+      to,
+      subject,
+      html,
+    });
+    if (error) throw new Error(error.message);
+    console.log(`[Email] Sent "${subject}" → ${to} (id: ${data.id})`);
+    return { success: true, id: data.id };
   } catch (err) {
-    console.error(`[Email] ❌ Failed "${subject}" → ${to}:`, err.message);
+    console.error(`[Email] Failed "${subject}" → ${to}:`, err.message);
     return { success: false };
   }
 };
@@ -88,7 +82,7 @@ const sendTransactionApproved = async (toEmail, firstName, tx) => {
     </div>
     <a href="${BASE}/transactions" class="btn">View Transactions</a>
   `);
-  return send(toEmail, '✅ Transaction Approved — BudMap', html);
+  return send(toEmail, 'Transaction Approved — BudMap', html);
 };
 
 // ── 2. Transaction Rejected ──────────────────────────────────────────────────
@@ -104,7 +98,7 @@ const sendTransactionRejected = async (toEmail, firstName, tx) => {
     <p>Please contact your Finance Officer if you believe this is an error.</p>
     <a href="${BASE}/transactions" class="btn" style="background:#dc2626">View Transactions</a>
   `);
-  return send(toEmail, '❌ Transaction Rejected — BudMap', html);
+  return send(toEmail, 'Transaction Rejected — BudMap', html);
 };
 
 // ── 3. Budget Approved ───────────────────────────────────────────────────────
@@ -121,23 +115,22 @@ const sendBudgetApproved = async (toEmail, firstName, budget) => {
     </div>
     <a href="${BASE}/budgets" class="btn">View Budget</a>
   `);
-  return send(toEmail, '✅ Budget Approved — BudMap', html);
+  return send(toEmail, 'Budget Approved — BudMap', html);
 };
 
-// ── 4. Budget Alert (threshold reached) ─────────────────────────────────────
+// ── 4. Budget Alert ──────────────────────────────────────────────────────────
 const sendBudgetAlert = async (toEmail, firstName, budget, utilizationPct) => {
   const isOver     = utilizationPct >= 100;
   const color      = isOver ? '#dc2626' : '#f59e0b';
   const badgeClass = isOver ? 'badge-red' : 'badge-yellow';
   const label      = isOver ? 'Over Budget!' : 'Warning: High Usage';
   const alertClass = isOver ? 'alert-danger' : 'alert-warn';
-  const icon       = isOver ? '🚨' : '⚠️';
 
   const html = shell(color, `Budget Alert — ${label}`, `
     <h2>Hi ${firstName},</h2>
     <p>Budget utilization alert for <strong>${budget.name}</strong>.</p>
     <div class="alert-box ${alertClass}">
-      ${icon} <strong>${utilizationPct.toFixed(1)}% of the budget has been used.</strong>
+      <strong>${utilizationPct.toFixed(1)}% of the budget has been used.</strong>
       ${isOver ? ' The budget has been exceeded.' : ' Consider reviewing spending.'}
     </div>
     <div class="box">
@@ -149,10 +142,10 @@ const sendBudgetAlert = async (toEmail, firstName, budget, utilizationPct) => {
     </div>
     <a href="${BASE}/budgets" class="btn" style="background:${color}">View Budget</a>
   `);
-  return send(toEmail, `${icon} Budget Alert: ${budget.name} — BudMap`, html);
+  return send(toEmail, `Budget Alert: ${budget.name} — BudMap`, html);
 };
 
-// ── 5. Budget Request Submitted (notify Finance Officers/Admins) ─────────────
+// ── 5. Budget Request Notification ──────────────────────────────────────────
 const sendBudgetRequestNotification = async (toEmail, reviewerName, request, submitterName) => {
   const html = shell('#2563eb', 'New Budget Request Pending Review', `
     <h2>Hi ${reviewerName},</h2>
@@ -168,24 +161,24 @@ const sendBudgetRequestNotification = async (toEmail, reviewerName, request, sub
     ${request.description ? `<p style="font-size:13px;color:#6b7280;margin-top:8px"><em>"${request.description}"</em></p>` : ''}
     <a href="${BASE}/budget-approvals" class="btn" style="background:#2563eb">Review Request</a>
   `);
-  return send(toEmail, '📋 New Budget Request Pending — BudMap', html);
+  return send(toEmail, 'New Budget Request Pending — BudMap', html);
 };
 
 // ── Welcome ──────────────────────────────────────────────────────────────────
 const sendWelcomeEmail = async (toEmail, firstName) => {
   const html = shell('#10b981', 'Welcome to BudMap', `
     <h2>Welcome, ${firstName}!</h2>
-    <p>Your BudMap account has been created successfully. You're all set to start managing budgets smarter.</p>
+    <p>Your BudMap account has been created successfully. You are all set to start managing budgets smarter.</p>
     <div class="box">
-      <div class="row"><span class="lbl">✅ Real-time budget tracking</span><span class="val"></span></div>
-      <div class="row"><span class="lbl">✅ Role-based access control</span><span class="val"></span></div>
-      <div class="row"><span class="lbl">✅ Detailed financial reports</span><span class="val"></span></div>
-      <div class="row"><span class="lbl">✅ AI-powered forecasting</span><span class="val"></span></div>
+      <div class="row"><span class="lbl">Real-time budget tracking</span><span class="val">Included</span></div>
+      <div class="row"><span class="lbl">Role-based access control</span><span class="val">Included</span></div>
+      <div class="row"><span class="lbl">Detailed financial reports</span><span class="val">Included</span></div>
+      <div class="row"><span class="lbl">AI-powered forecasting</span><span class="val">Included</span></div>
     </div>
     <a href="${BASE}/dashboard" class="btn">Go to Dashboard</a>
     <p style="margin-top:20px;font-size:12px;color:#9ca3af">If you did not create this account, please ignore this email.</p>
   `);
-  return send(toEmail, '👋 Welcome to BudMap!', html);
+  return send(toEmail, 'Welcome to BudMap!', html);
 };
 
 // ── Password Reset ───────────────────────────────────────────────────────────
@@ -196,9 +189,9 @@ const sendPasswordResetEmail = async (toEmail, firstName, resetToken) => {
     <p>We received a request to reset your BudMap password. Click below to set a new password:</p>
     <a href="${link}" class="btn" style="background:#2563eb">Reset My Password</a>
     <div class="box" style="margin-top:16px;word-break:break-all;font-size:12px;font-family:monospace">${link}</div>
-    <div class="alert-box alert-warn" style="margin-top:16px">⚠️ This link expires in <strong>1 hour</strong>. If you didn't request this, ignore this email.</div>
+    <div class="alert-box alert-warn" style="margin-top:16px">This link expires in <strong>1 hour</strong>. If you did not request this, ignore this email.</div>
   `);
-  return send(toEmail, '🔑 Reset Your BudMap Password', html);
+  return send(toEmail, 'Reset Your BudMap Password', html);
 };
 
 // ── Google Login ─────────────────────────────────────────────────────────────
@@ -209,35 +202,32 @@ const sendGoogleLoginEmail = async (toEmail, firstName) => {
       <div class="row"><span class="lbl">Method</span><span class="val">Google OAuth</span></div>
       <div class="row"><span class="lbl">Time</span><span class="val">${new Date().toLocaleString('en-US', { dateStyle: 'long', timeStyle: 'short' })}</span></div>
     </div>
-    <div class="alert-box alert-warn">⚠️ If this wasn't you, contact your administrator immediately.</div>
+    <div class="alert-box alert-warn">If this was not you, contact your administrator immediately.</div>
   `);
-  return send(toEmail, '🔐 New Google Sign-in — BudMap', html);
+  return send(toEmail, 'New Google Sign-in — BudMap', html);
 };
 
-// ── Email Verification ──────────────────────────────────────────────────────
+// ── Email Verification ───────────────────────────────────────────────────────
 const sendVerificationEmail = async (toEmail, firstName, verifyLink) => {
   const html = shell('#10b981', 'Verify Your Email Address', `
     <h2>Hi ${firstName},</h2>
     <p>Thanks for registering on BudMap! Please verify your email address to activate your account.</p>
     <a href="${verifyLink}" class="btn">Verify My Email</a>
     <div class="box" style="margin-top:16px;word-break:break-all;font-size:12px;font-family:monospace">${verifyLink}</div>
-    <div class="alert-box alert-warn" style="margin-top:16px">⚠️ This link expires in <strong>24 hours</strong>.</div>
+    <div class="alert-box alert-warn" style="margin-top:16px">This link expires in <strong>24 hours</strong>.</div>
     <p style="margin-top:16px;font-size:12px;color:#9ca3af">If you did not create this account, please ignore this email.</p>
   `);
-  return send(toEmail, '✉️ Verify Your BudMap Email Address', html);
+  return send(toEmail, 'Verify Your BudMap Email Address', html);
 };
 
-// ── SMTP test ────────────────────────────────────────────────────────────────
+// ── Connection test ───────────────────────────────────────────────────────────
 const testEmailConnection = async () => {
-  try {
-    const t = createTransporter();
-    await t.verify();
-    console.log('[Email] ✅ SMTP connection verified');
-    return true;
-  } catch (err) {
-    console.warn('[Email] ⚠️  SMTP not available:', err.message);
+  if (!process.env.RESEND_API_KEY) {
+    console.warn('[Email] RESEND_API_KEY not set — emails will be skipped');
     return false;
   }
+  console.log(`[Email] Resend ready — sending from ${FROM}`);
+  return true;
 };
 
 module.exports = {
