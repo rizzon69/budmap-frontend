@@ -11,7 +11,7 @@ const {
   sendVerificationEmail,
 } = require('../services/emailService');
 
-const BASE_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+const BASE_URL = process.env.FRONTEND_URL;
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 const makeToken = () => crypto.randomBytes(32).toString('hex');
@@ -79,7 +79,6 @@ router.post('/organization', async (req, res) => {
       data: {
         organization: { id: newOrg._id, name: newOrg.name, type: newOrg.type },
         user: { id: newUser._id, email: newUser.email, firstName: newUser.firstName, role: newUser.role },
-        verificationLink: process.env.NODE_ENV === 'development' ? link : undefined,
       },
     });
   } catch (err) {
@@ -128,7 +127,6 @@ router.post('/user', async (req, res) => {
       success: true,
       message: 'Account created! Please verify your email before logging in.',
       data: { id: newUser._id, email: newUser.email, firstName: newUser.firstName, role: newUser.role },
-      verificationLink: process.env.NODE_ENV === 'development' ? link : undefined,
     });
   } catch (err) {
     console.error('User registration error:', err);
@@ -212,7 +210,6 @@ router.post('/resend-verification', async (req, res) => {
     res.json({
       success: true,
       message: 'Verification email sent! Please check your inbox.',
-      verificationLink: process.env.NODE_ENV === 'development' ? link : undefined,
     });
   } catch (err) {
     console.error('Resend verification error:', err);

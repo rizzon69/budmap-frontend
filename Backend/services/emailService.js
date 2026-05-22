@@ -2,14 +2,21 @@ const { Resend } = require('resend');
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM = process.env.EMAIL_FROM || 'noreply@reazonkoirala.com.np';
-const BASE = process.env.FRONTEND_URL || 'http://localhost:3000';
+
+// Dynamically resolve the correct frontend base URL.
+// In production FRONTEND_URL is set to the hosted domain (e.g. https://budmap-frontend.vercel.app).
+// Locally it falls back to localhost:3000 so dev emails still work.
+const getBase = () => process.env.FRONTEND_URL || 'http://localhost:3000';
+
 const YEAR = new Date().getFullYear();
 
 const fmt = (v) =>
   new Intl.NumberFormat('en-NP', { style: 'currency', currency: 'NPR', minimumFractionDigits: 0 }).format(v || 0);
 
 // ── shared HTML shell ────────────────────────────────────────────────────────
-const shell = (headerColor, title, body) => `
+const shell = (headerColor, title, body) => {
+  const BASE = getBase();
+  return `
 <!DOCTYPE html><html><head><meta charset="utf-8">
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
@@ -45,6 +52,7 @@ const shell = (headerColor, title, body) => `
     <a href="${BASE}" style="color:#10b981;text-decoration:none">Open BudMap</a>
   </div>
 </div></body></html>`;
+};
 
 // ── core send ────────────────────────────────────────────────────────────────
 const send = async (to, subject, html) => {
@@ -70,6 +78,7 @@ const send = async (to, subject, html) => {
 
 // ── 1. Transaction Approved ──────────────────────────────────────────────────
 const sendTransactionApproved = async (toEmail, firstName, tx) => {
+  const BASE = getBase();
   const html = shell('#10b981', 'Transaction Approved', `
     <h2>Hi ${firstName},</h2>
     <p>Your transaction has been <span class="badge-green">Approved</span> and recorded.</p>
@@ -87,6 +96,7 @@ const sendTransactionApproved = async (toEmail, firstName, tx) => {
 
 // ── 2. Transaction Rejected ──────────────────────────────────────────────────
 const sendTransactionRejected = async (toEmail, firstName, tx) => {
+  const BASE = getBase();
   const html = shell('#dc2626', 'Transaction Rejected', `
     <h2>Hi ${firstName},</h2>
     <p>Unfortunately your transaction has been <span class="badge-red">Rejected</span>.</p>
@@ -103,6 +113,7 @@ const sendTransactionRejected = async (toEmail, firstName, tx) => {
 
 // ── 3. Budget Approved ───────────────────────────────────────────────────────
 const sendBudgetApproved = async (toEmail, firstName, budget) => {
+  const BASE = getBase();
   const html = shell('#10b981', 'Budget Approved', `
     <h2>Hi ${firstName},</h2>
     <p>Your budget request has been <span class="badge-green">Approved</span> and is now active.</p>
@@ -120,6 +131,7 @@ const sendBudgetApproved = async (toEmail, firstName, budget) => {
 
 // ── 4. Budget Alert ──────────────────────────────────────────────────────────
 const sendBudgetAlert = async (toEmail, firstName, budget, utilizationPct) => {
+  const BASE = getBase();
   const isOver     = utilizationPct >= 100;
   const color      = isOver ? '#dc2626' : '#f59e0b';
   const badgeClass = isOver ? 'badge-red' : 'badge-yellow';
@@ -147,6 +159,7 @@ const sendBudgetAlert = async (toEmail, firstName, budget, utilizationPct) => {
 
 // ── 5. Budget Request Notification ──────────────────────────────────────────
 const sendBudgetRequestNotification = async (toEmail, reviewerName, request, submitterName) => {
+  const BASE = getBase();
   const html = shell('#2563eb', 'New Budget Request Pending Review', `
     <h2>Hi ${reviewerName},</h2>
     <p>A new budget request requires your review.</p>
@@ -166,6 +179,7 @@ const sendBudgetRequestNotification = async (toEmail, reviewerName, request, sub
 
 // ── Welcome ──────────────────────────────────────────────────────────────────
 const sendWelcomeEmail = async (toEmail, firstName) => {
+  const BASE = getBase();
   const html = shell('#10b981', 'Welcome to BudMap', `
     <h2>Welcome, ${firstName}!</h2>
     <p>Your BudMap account has been created successfully. You are all set to start managing budgets smarter.</p>
@@ -183,6 +197,7 @@ const sendWelcomeEmail = async (toEmail, firstName) => {
 
 // ── Password Reset ───────────────────────────────────────────────────────────
 const sendPasswordResetEmail = async (toEmail, firstName, resetToken) => {
+  const BASE = getBase();
   const link = `${BASE}/reset-password?token=${resetToken}`;
   const html = shell('#2563eb', 'Password Reset Request', `
     <h2>Hi ${firstName},</h2>
@@ -196,6 +211,7 @@ const sendPasswordResetEmail = async (toEmail, firstName, resetToken) => {
 
 // ── Google Login ─────────────────────────────────────────────────────────────
 const sendGoogleLoginEmail = async (toEmail, firstName) => {
+  const BASE = getBase();
   const html = shell('#10b981', 'New Google Sign-in Detected', `
     <p>Hi <strong>${firstName}</strong>,</p>
     <div class="box">

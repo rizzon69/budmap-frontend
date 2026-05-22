@@ -99,10 +99,7 @@ router.post('/register', async (req, res) => {
     res.status(201).json({
       success: true,
       message: 'Account created! Please check your email to verify your address before logging in.',
-      data: {
-        user: userObj, token,
-        verificationLink: process.env.NODE_ENV === 'development' ? verifyLink : undefined,
-      }
+      data: { user: userObj, token }
     });
   } catch (error) {
     console.error('Registration error:', error);

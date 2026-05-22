@@ -167,16 +167,6 @@ const RegisterPage = () => {
                 Click the link to activate your account.
               </p>
 
-              {registered.devLink && (
-                <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 10, padding: 16, marginBottom: 20, textAlign: 'left' }}>
-                  <p style={{ fontSize: 12, fontWeight: 700, color: '#166534', marginBottom: 6 }}>
-                    Dev mode — click to verify instantly:
-                  </p>
-                  <a href={registered.devLink} style={{ fontSize: 12, color: '#16a34a', wordBreak: 'break-all' }}>
-                    {registered.devLink}
-                  </a>
-                </div>
-              )}
 
               {resendMsg && (
                 <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, padding: '10px 14px', marginBottom: 16, fontSize: 13, color: '#166534' }}>
