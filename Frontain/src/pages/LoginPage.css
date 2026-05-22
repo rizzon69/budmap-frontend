@@ -181,9 +181,14 @@
   color: #10b981;
 }
 
+.input-wrapper .form-input,
+.input-wrapper input {
+  padding-left: 40px !important;
+}
+
 .form-input {
   width: 100%;
-  padding: 0.7rem 0.9rem 0.7rem 2.6rem;
+  padding: 0.7rem 0.9rem 0.7rem 40px;
   border: 1.5px solid #e5e7eb;
   border-radius: 10px;
   font-size: 0.9rem;
