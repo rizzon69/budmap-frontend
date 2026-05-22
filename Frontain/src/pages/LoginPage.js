@@ -35,8 +35,8 @@ const LoginPage = () => {
   };
 
   const handleGoogleSignIn = () => {
-    const base = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-    window.location.href = `${base}/auth/google`;
+    const backendUrl = process.env.REACT_APP_BACKEND_URL || process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:5000';
+    window.location.href = `${backendUrl}/api/auth/google`;
   };
 
   const handleForgotPassword = async (e) => {

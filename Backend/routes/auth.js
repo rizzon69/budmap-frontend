@@ -17,7 +17,7 @@ const EmailToken = require('../models/EmailToken');
 const SiteSettings = require('../models/SiteSettings');
 
 const makeToken = () => crypto.randomBytes(32).toString('hex');
-const BASE_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+const BASE_URL = process.env.FRONTEND_URL;
 
 // ── Helper: generate JWT ───────────────────────────────────────────────────────
 const generateToken = (user) => {
@@ -364,7 +364,7 @@ router.get('/google',
 // ── Google OAuth: Callback ────────────────────────────────────────────────────
 router.get('/google/callback',
   passport.authenticate('google', {
-    failureRedirect: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=google_failed`,
+    failureRedirect: `${process.env.FRONTEND_URL}/login?error=google_failed`,
     session: false
   }),
   async (req, res) => {
@@ -385,11 +385,11 @@ router.get('/google/callback',
       }));
 
       res.redirect(
-        `${process.env.FRONTEND_URL || 'http://localhost:3000'}/auth/google/success?token=${token}&user=${userData}`
+        `${process.env.FRONTEND_URL}/auth/google/success?token=${token}&user=${userData}`
       );
     } catch (error) {
       console.error('Google callback error:', error);
-      res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=google_failed`);
+      res.redirect(`${process.env.FRONTEND_URL}/login?error=google_failed`);
     }
   }
 );
